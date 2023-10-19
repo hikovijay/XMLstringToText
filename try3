@@ -1,31 +1,48 @@
-import java.io.*;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 
-public class PrintToCaptureString {
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+public class DeleteCellsWithSpecificCharacter {
     public static void main(String[] args) {
-        // Create a ByteArrayOutputStream to capture the printed content
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-        // Create a PrintStream to write to the ByteArrayOutputStream
-        PrintStream printStream = new PrintStream(outputStream);
-
-        // Redirect the standard output to the PrintStream
-        System.setOut(printStream);
-
-        // Now, anything printed to System.out will be captured in the outputStream
-
-        // Example: Printing "Hello, world!"
-        System.out.println("Hello, world!");
-
-        // Get the captured output as a string
-        String capturedOutput = outputStream.toString();
-
-        // Print the captured output
-        System.out.println("Captured Output: " + capturedOutput);
-
-        // Close the PrintStream and ByteArrayOutputStream
-        printStream.close();
         try {
-            outputStream.close();
+            // Load your Excel file
+            FileInputStream fileInputStream = new FileInputStream("your_excel_file.xlsx");
+            Workbook workbook = new XSSFWorkbook(fileInputStream);
+            XSSFSheet sheet = (XSSFSheet) workbook.getSheetAt(0); // Change the sheet index as needed
+
+            // Specify the specific character or value to search for
+            String characterToSearch = "X"; // Replace with the character or value you want to search for
+
+            // Iterate through the rows and cells in the sheet
+            for (int rowIndex = 0; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+                Row row = sheet.getRow(rowIndex);
+                if (row != null) {
+                    for (int cellIndex = 0; cellIndex < row.getLastCellNum(); cellIndex++) {
+                        Cell cell = row.getCell(cellIndex);
+                        if (cell != null) {
+                            if (cell.getCellType() == CellType.STRING) {
+                                String cellValue = cell.getStringCellValue();
+                                if (cellValue != null && cellValue.contains(characterToSearch)) {
+                                    // Remove the content of the cell
+                                    cell.setCellValue("");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Save the modified Excel file
+            FileOutputStream fileOutputStream = new FileOutputStream("modified_excel_file.xlsx");
+            workbook.write(fileOutputStream);
+            fileOutputStream.close();
+            workbook.close();
+
+            System.out.println("Cells with the specific character have been deleted and the file has been saved.");
         } catch (IOException e) {
             e.printStackTrace();
         }
