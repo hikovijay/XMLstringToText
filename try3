@@ -1,77 +1,22 @@
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.StringReader;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-
-public class XMLCleanup {
+public class RemoveHtmlTagsWithReplaceAll {
     public static void main(String[] args) {
-        try {
-            // Your XML string
-            String xmlString = "<root><item><name>Item 1</name><description>Some <b>HTML</b> content.</description></item><item><name>Item 2</name><description>More <i>HTML</i> content.</description></item></root>";
+        // Your input string containing HTML tags
+        String inputString = "<p>This is <b>bold</b> and <i>italic</i>.</p>";
 
-            // Parse the XML string
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document doc = builder.parse(new InputSource(new StringReader(xmlString)));
+        // Remove HTML tags using replaceAll
+        String cleanedString = removeHtmlTags(inputString);
 
-            // Create a set to track unique descriptions
-            Set<String> uniqueDescriptions = new HashSet<>();
-
-            // Create a regular expression pattern to match HTML tags
-            Pattern htmlTagPattern = Pattern.compile("<[^>]+>");
-
-            // Iterate through the XML and remove HTML tags, eliminating repetition
-            NodeList items = doc.getElementsByTagName("item");
-            for (int i = 0; i < items.getLength(); i++) {
-                Element item = (Element) items.item(i);
-                Element description = (Element) item.getElementsByTagName("description").item(0);
-
-                if (description != null) {
-                    String descriptionText = description.getTextContent();
-                    Matcher matcher = htmlTagPattern.matcher(descriptionText);
-                    descriptionText = matcher.replaceAll(""); // Remove HTML tags
-
-                    // Check if the cleaned description is unique
-                    if (!uniqueDescriptions.contains(descriptionText)) {
-                        uniqueDescriptions.add(descriptionText);
-                        description.setTextContent(descriptionText);
-                    } else {
-                        // If it's a repetition, remove the item from the XML
-                        item.getParentNode().removeChild(item);
-                    }
-                }
-            }
-
-            // Convert the modified XML back to a string
-            String cleanedXmlString = xmlToString(doc);
-
-            System.out.println(cleanedXmlString);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // Print the cleaned string
+        System.out.println(cleanedString);
     }
 
-    // Helper function to convert a Document back to an XML string
-    private static String xmlToString(Document doc) {
-        try {
-            javax.xml.transform.TransformerFactory transformerFactory = javax.xml.transform.TransformerFactory.newInstance();
-            javax.xml.transform.Transformer transformer = transformerFactory.newTransformer();
-            javax.xml.transform.dom.DOMSource source = new javax.xml.transform.dom.DOMSource(doc);
-            java.io.StringWriter writer = new java.io.StringWriter();
-            javax.xml.transform.stream.StreamResult result = new javax.xml.transform.stream.StreamResult(writer);
-            transformer.transform(source, result);
-            return writer.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+    public static String removeHtmlTags(String inputString) {
+        // Regular expression to match HTML tags
+        String htmlTagPattern = "<[^>]+>";
+
+        // Use replaceAll to remove HTML tags
+        String cleanedString = inputString.replaceAll(htmlTagPattern, "");
+
+        return cleanedString;
     }
 }
