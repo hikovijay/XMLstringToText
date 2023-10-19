@@ -1,48 +1,54 @@
-import org.w3c.dom.*;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
-public class DOMElementToString {
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.StringReader;
+
+public class DOMElementsToString {
     public static void main(String[] args) {
         try {
-            // Create a new DOM Document (you can load your XML data here)
+            // Your XML string
+            String xmlString = "<root><item><name>Item 1</name><price>10.00</price></item><item><name>Item 2</name><price>15.00</price></item></root>";
+
+            // Create a DocumentBuilder
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.newDocument();
 
-            // Create a sample DOM element with nested elements
-            Element rootElement = document.createElement("RootElement");
-            document.appendChild(rootElement);
+            // Parse the XML string
+            Document document = builder.parse(new InputSource(new StringReader(xmlString)));
 
-            Element childElement = document.createElement("ChildElement");
-            rootElement.appendChild(childElement);
+            // Get all elements in the DOM and convert to a string
+            String allElementsAsString = elementsToString(document.getDocumentElement(), "");
 
-            Element nestedElement = document.createElement("NestedElement");
-            nestedElement.appendChild(document.createTextNode("This is nested text."));
-            childElement.appendChild(nestedElement);
-
-            // Copy the entire DOM element to a string
-            String elementString = elementToString(rootElement);
-
-            // Print the string representation of the DOM element
-            System.out.println(elementString);
+            System.out.println("All elements in the DOM:\n" + allElementsAsString);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static String elementToString(Element element) {
-        try {
-            TransformerFactory tf = TransformerFactory.newInstance();
-            Transformer transformer = tf.newTransformer();
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            StringWriter writer = new StringWriter();
-            transformer.transform(new DOMSource(element), new StreamResult(writer));
-            return writer.getBuffer().toString();
-        } catch (TransformerException e) {
-            e.printStackTrace();
-            return null;
+    public static String elementsToString(Element element, String indent) {
+        StringBuilder result = new StringBuilder();
+        result.append(indent).append("<").append(element.getTagName()).append(">\n");
+
+        NodeList children = element.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child instanceof Element) {
+                result.append(elementsToString((Element) child, indent + "  "));
+            }
         }
+
+        String textContent = element.getTextContent().trim();
+        if (!textContent.isEmpty()) {
+            result.append(indent).append("  ").append(textContent).append("\n");
+        }
+
+        result.append(indent).append("</").append(element.getTagName()).append(">\n");
+
+        return result.toString();
     }
 }
