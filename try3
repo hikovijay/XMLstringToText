@@ -1,22 +1,27 @@
-public class RemoveHtmlTagsWithReplaceAll {
+public class RemoveCharactersAfterElement {
     public static void main(String[] args) {
-        // Your input string containing HTML tags
-        String inputString = "<p>This is <b>bold</b> and <i>italic</i>.</p>";
+        // Your input line
+        String inputLine = "This is a sample line with some text to remove after this element - End of the line.";
 
-        // Remove HTML tags using replaceAll
-        String cleanedString = removeHtmlTags(inputString);
+        // Specify the element or marker after which you want to remove characters
+        String elementToRemoveAfter = "End of the line";
 
-        // Print the cleaned string
-        System.out.println(cleanedString);
+        // Remove characters after the element
+        String cleanedLine = removeCharactersAfterElement(inputLine, elementToRemoveAfter);
+
+        // Print the cleaned line
+        System.out.println(cleanedLine);
     }
 
-    public static String removeHtmlTags(String inputString) {
-        // Regular expression to match HTML tags
-        String htmlTagPattern = "<[^>]+>";
+    public static String removeCharactersAfterElement(String inputLine, String elementToRemoveAfter) {
+        int indexOfElement = inputLine.indexOf(elementToRemoveAfter);
 
-        // Use replaceAll to remove HTML tags
-        String cleanedString = inputString.replaceAll(htmlTagPattern, "");
-
-        return cleanedString;
+        if (indexOfElement != -1) {
+            // Use substring to remove characters after the element
+            return inputLine.substring(0, indexOfElement + elementToRemoveAfter.length());
+        } else {
+            // Element not found, return the original line
+            return inputLine;
+        }
     }
 }
