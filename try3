@@ -1,20 +1,41 @@
- char characterToDelete = 'X';
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-            // Iterate through the sheets in the workbook
-            for (int sheetIndex = 0; sheetIndex < workbook.getNumberOfSheets(); sheetIndex++) {
-                Sheet sheet = workbook.getSheetAt(sheetIndex);
+import java.io.FileInputStream;
+import java.io.IOException;
 
-                // Iterate through the rows and cells in the sheet
-                for (Row row : sheet) {
-                    for (Cell cell : row) {
-                        if (cell.getCellType() == CellType.STRING) {
-                            String cellValue = cell.getStringCellValue();
-                            if (cellValue != null && cellValue.contains(String.valueOf(characterToDelete))) {
-                                // Remove the character from the cell's value
-                                cellValue = cellValue.replace(String.valueOf(characterToDelete), "");
-                                cell.setCellValue(cellValue);
-                            }
-                        }
+public class ExcelDataFetcher {
+    public static String fetchExcelDataToString(String filePath, int sheetNumber) {
+        StringBuilder dataStringBuilder = new StringBuilder();
+
+        try {
+            FileInputStream fileInputStream = new FileInputStream(filePath);
+            Workbook workbook = new XSSFWorkbook(fileInputStream);
+            Sheet sheet = workbook.getSheetAt(sheetNumber);
+
+            for (Row row : sheet) {
+                for (Cell cell : row) {
+                    if (cell.getCellType() == CellType.STRING) {
+                        String cellValue = cell.getStringCellValue();
+                        dataStringBuilder.append(cellValue).append(" "); // Append cell data to the string
                     }
                 }
+                dataStringBuilder.append("\n"); // Add a new line for each row
             }
+
+            workbook.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return dataStringBuilder.toString();
+    }
+
+    public static void main(String[] args) {
+        String filePath = "your_excel_file.xlsx"; // Replace with your file path
+        int sheetNumber = 0; // Replace with the sheet number you want to read
+
+        String excelData = fetchExcelDataToString(filePath, sheetNumber);
+        System.out.println(excelData);
+    }
+}
