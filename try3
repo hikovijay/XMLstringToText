@@ -1,11 +1,36 @@
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.File;
 import java.io.FileOutputStream;
+
+public class StringToExcelRows {
+    public static void main(String[] args) {
+        try {
+            // Your input string with newlines
+            String inputString = "Row 1\nRow 2\nRow 3\nRow 4";
+
+            // Split the string into an array of lines
+            String[] lines = inputString.split("\n");
+
+            // Create a new Excel workbook
+            Workbook workbook = new XSSFWorkbook();
+            Sheet sheet = workbook.createSheet("StringData");
+
+            // Write each line to a new row in Excel
+            for (int i = 0; i < lines.length; i++) {
+                Row row = sheet.createRow(i);
+                Cell cell = row.createCell(0);
+                cell.setCellValue(lines[i]);
+            }
+
+            // Save the Excel file
+            FileOutputStream outputStream = new FileOutputStream("string_data_rows.xlsx");
+            workbook.write(outputStream);
+            outputStream.close();
+
+            System.out.println("String data has been saved to string_data_rows.xlsx");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
