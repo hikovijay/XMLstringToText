@@ -1,49 +1,17 @@
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-public class FindAndReplaceInExcel {
-    public static void main(String[] args) {
-        try {
-            // Load the existing Excel file
-            FileInputStream fileInputStream = new FileInputStream("existing_workbook.xlsx");
-            Workbook workbook = new XSSFWorkbook(fileInputStream);
-
-            // Get the first sheet (you can modify this to select the desired sheet)
-            Sheet sheet = workbook.getSheetAt(0);
-
-            // Character to find and replace
-            char findChar = 'X';
-            char replaceChar = 'Y';
+  // String to find and replace
+            String findString = "oldString";
+            String replaceString = "newString";
 
             // Iterate through the rows and cells
             for (Row row : sheet) {
                 for (Cell cell : row) {
                     if (cell.getCellType() == CellType.STRING) {
                         String cellValue = cell.getStringCellValue();
-                        if (cellValue.contains(String.valueOf(findChar))) {
-                            // Replace the character
-                            cellValue = cellValue.replace(findChar, replaceChar);
+                        if (cellValue.contains(findString)) {
+                            // Replace the string
+                            cellValue = cellValue.replace(findString, replaceString);
                             cell.setCellValue(cellValue);
                         }
                     }
                 }
             }
-
-            // Save the modified Excel file
-            FileOutputStream fileOutputStream = new FileOutputStream("existing_workbook.xlsx");
-            workbook.write(fileOutputStream);
-
-            // Close input and output streams
-            fileInputStream.close();
-            fileOutputStream.close();
-
-            System.out.println("Character replaced in the Excel file.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-}
