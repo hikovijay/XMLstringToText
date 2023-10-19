@@ -1,27 +1,11 @@
-int rowIndex = 0;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
-            // Process child elements and add data to Excel in columns
-            NodeList elements = root.getChildNodes();
-            for (int i = 0; i < elements.getLength(); i++) {
-                Node elementNode = elements.item(i);
-
-                // Skip non-element nodes (e.g., text nodes)
-                if (elementNode.getNodeType() != Node.ELEMENT_NODE) {
-                    continue;
-                }
-
-                Element element = (Element) elementNode;
-
-                // Create a new row
-                Row row = sheet.createRow(rowIndex++);
-
-                // Process and add data to Excel cells
-                String elementText = element.getTextContent();
-
-                String[] lines = elementText.split("\n");
-                int columnIndex = 0;
-                for (String line : lines) {
-                    Cell cell = row.createCell(columnIndex++);
-                    cell.setCellValue(line);
-                }
-            }
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.File;
+import java.io.FileOutputStream;
