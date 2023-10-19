@@ -1,48 +1,47 @@
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class DeleteCellsWithSpecificCharacter {
+public class FindAndReplaceInExcel {
     public static void main(String[] args) {
         try {
-            // Load your Excel file
-            FileInputStream fileInputStream = new FileInputStream("your_excel_file.xlsx");
+            // Load the existing Excel file
+            FileInputStream fileInputStream = new FileInputStream("existing_workbook.xlsx");
             Workbook workbook = new XSSFWorkbook(fileInputStream);
-            XSSFSheet sheet = (XSSFSheet) workbook.getSheetAt(0); // Change the sheet index as needed
 
-            // Specify the specific character or value to search for
-            String characterToSearch = "X"; // Replace with the character or value you want to search for
+            // Get the first sheet (you can modify this to select the desired sheet)
+            Sheet sheet = workbook.getSheetAt(0);
 
-            // Iterate through the rows and cells in the sheet
-            for (int rowIndex = 0; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
-                Row row = sheet.getRow(rowIndex);
-                if (row != null) {
-                    for (int cellIndex = 0; cellIndex < row.getLastCellNum(); cellIndex++) {
-                        Cell cell = row.getCell(cellIndex);
-                        if (cell != null) {
-                            if (cell.getCellType() == CellType.STRING) {
-                                String cellValue = cell.getStringCellValue();
-                                if (cellValue != null && cellValue.contains(characterToSearch)) {
-                                    // Remove the content of the cell
-                                    cell.setCellValue("");
-                                }
-                            }
+            // Character to find and replace
+            char findChar = 'X';
+            char replaceChar = 'Y';
+
+            // Iterate through the rows and cells
+            for (Row row : sheet) {
+                for (Cell cell : row) {
+                    if (cell.getCellType() == CellType.STRING) {
+                        String cellValue = cell.getStringCellValue();
+                        if (cellValue.contains(String.valueOf(findChar))) {
+                            // Replace the character
+                            cellValue = cellValue.replace(findChar, replaceChar);
+                            cell.setCellValue(cellValue);
                         }
                     }
                 }
             }
 
             // Save the modified Excel file
-            FileOutputStream fileOutputStream = new FileOutputStream("modified_excel_file.xlsx");
+            FileOutputStream fileOutputStream = new FileOutputStream("existing_workbook.xlsx");
             workbook.write(fileOutputStream);
-            fileOutputStream.close();
-            workbook.close();
 
-            System.out.println("Cells with the specific character have been deleted and the file has been saved.");
+            // Close input and output streams
+            fileInputStream.close();
+            fileOutputStream.close();
+
+            System.out.println("Character replaced in the Excel file.");
         } catch (IOException e) {
             e.printStackTrace();
         }
