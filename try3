@@ -4,8 +4,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-public class ExcelDataFetcher {
-    public static String fetchExcelDataToString(String filePath, int sheetNumber) {
+public class ExcelColumnDataFetcher {
+    public static String fetchExcelColumnDataToString(String filePath, int sheetNumber, int columnNumber) {
         StringBuilder dataStringBuilder = new StringBuilder();
 
         try {
@@ -14,13 +14,13 @@ public class ExcelDataFetcher {
             Sheet sheet = workbook.getSheetAt(sheetNumber);
 
             for (Row row : sheet) {
-                for (Cell cell : row) {
+                Cell cell = row.getCell(columnNumber);
+                if (cell != null) {
                     if (cell.getCellType() == CellType.STRING) {
                         String cellValue = cell.getStringCellValue();
-                        dataStringBuilder.append(cellValue).append(" "); // Append cell data to the string
+                        dataStringBuilder.append(cellValue).append("\n"); // Append cell data to the string with a new line
                     }
                 }
-                dataStringBuilder.append("\n"); // Add a new line for each row
             }
 
             workbook.close();
@@ -34,8 +34,9 @@ public class ExcelDataFetcher {
     public static void main(String[] args) {
         String filePath = "your_excel_file.xlsx"; // Replace with your file path
         int sheetNumber = 0; // Replace with the sheet number you want to read
+        int columnNumber = 1; // Replace with the column number you want to fetch (0 for the first column)
 
-        String excelData = fetchExcelDataToString(filePath, sheetNumber);
-        System.out.println(excelData);
+        String columnData = fetchExcelColumnDataToString(filePath, sheetNumber, columnNumber);
+        System.out.println(columnData);
     }
 }
