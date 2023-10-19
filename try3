@@ -1,16 +1,19 @@
-  // String to find and replace
-            String findString = "oldString";
-            String replaceString = "newString";
+ char characterToDelete = 'X';
 
-            // Iterate through the rows and cells
-            for (Row row : sheet) {
-                for (Cell cell : row) {
-                    if (cell.getCellType() == CellType.STRING) {
-                        String cellValue = cell.getStringCellValue();
-                        if (cellValue.contains(findString)) {
-                            // Replace the string
-                            cellValue = cellValue.replace(findString, replaceString);
-                            cell.setCellValue(cellValue);
+            // Iterate through the sheets in the workbook
+            for (int sheetIndex = 0; sheetIndex < workbook.getNumberOfSheets(); sheetIndex++) {
+                Sheet sheet = workbook.getSheetAt(sheetIndex);
+
+                // Iterate through the rows and cells in the sheet
+                for (Row row : sheet) {
+                    for (Cell cell : row) {
+                        if (cell.getCellType() == CellType.STRING) {
+                            String cellValue = cell.getStringCellValue();
+                            if (cellValue != null && cellValue.contains(String.valueOf(characterToDelete))) {
+                                // Remove the character from the cell's value
+                                cellValue = cellValue.replace(String.valueOf(characterToDelete), "");
+                                cell.setCellValue(cellValue);
+                            }
                         }
                     }
                 }
