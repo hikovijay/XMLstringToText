@@ -1,45 +1,68 @@
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.StringReader;
+import java.io.File;
+import java.io.FileOutputStream;
 
-public class XMLToDOM {
+public class DOMElementToExcel {
     public static void main(String[] args) {
         try {
-            // Your XML content as a string
-            String xmlString = "<root><item><name>Item 1</name><price>10.00</price></item><item><name>Item 2</name><price>15.00</price></item></root>";
-
-            // Create a DocumentBuilderFactory
+            // Load your DOM document
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(new File("your_dom_data.xml"));
 
-            // Parse the XML string to create a DOM Document
-            Document document = builder.parse(new InputSource(new StringReader(xmlString)));
+            // Create a new Excel workbook
+            Workbook workbook = new XSSFWorkbook();
+            Sheet sheet = workbook.createSheet("DOMData");
 
-            // Print the XML content in a readable format
-            printDOM(document.getDocumentElement(), "");
+            // Get the root element or any specific element you want to export
+            Element root = doc.getDocumentElement();
 
+            // Create a row index to track the row number
+            int rowIndex = 0;
+
+            // Process child elements and add data to Excel
+            NodeList elements = root.getChildNodes();
+            for (int i = 0; i < elements.getLength(); i++) {
+                Node elementNode = elements.item(i);
+
+                // Skip non-element nodes (e.g., text nodes)
+                if (elementNode.getNodeType() != Node.ELEMENT_NODE) {
+                    continue;
+                }
+
+                Element element = (Element) elementNode;
+
+                // Create a new row
+                Row row = sheet.createRow(rowIndex++);
+
+                // Process and add data to Excel cells
+                // Here, we add the element name and text content as an example
+                String elementName = element.getTagName();
+                String elementText = element.getTextContent();
+
+                Cell cell1 = row.createCell(0);
+                cell1.setCellValue(elementName);
+
+                Cell cell2 = row.createCell(1);
+                cell2.setCellValue(elementText);
+            }
+
+            // Save the Excel file
+            FileOutputStream out = new FileOutputStream("dom_element_data.xlsx");
+            workbook.write(out);
+            out.close();
+
+            System.out.println("DOM element data has been saved to dom_element_data.xlsx");
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    // Recursively print the DOM structure in a readable format
-    public static void printDOM(Element element, String indent) {
-        System.out.println(indent + "<" + element.getTagName() + ">");
-        NodeList childNodes = element.getChildNodes();
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            if (childNodes.item(i) instanceof Element) {
-                printDOM((Element) childNodes.item(i), indent + "  ");
-            } else if (childNodes.item(i).getNodeType() == org.w3c.dom.Node.TEXT_NODE) {
-                String text = childNodes.item(i).getTextContent().trim();
-                if (!text.isEmpty()) {
-                    System.out.println(indent + "  " + text);
-                }
-            }
-        }
-        System.out.println(indent + "</" + element.getTagName() + ">");
     }
 }
