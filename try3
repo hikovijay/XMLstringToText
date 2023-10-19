@@ -1,27 +1,27 @@
 public class RemoveCharactersAfterElement {
     public static void main(String[] args) {
-        // Your input line
-        String inputLine = "This is a sample line with some text to remove after this element - End of the line.";
+        // Your input string
+        String inputString = "";
 
         // Specify the element or marker after which you want to remove characters
-        String elementToRemoveAfter = "End of the line";
+        String elementToRemoveAfter = "</";
 
         // Remove characters after the element
-        String cleanedLine = removeCharactersAfterElement(inputLine, elementToRemoveAfter);
+        String cleanedString = removeCharactersAfterElement(inputString, elementToRemoveAfter);
 
-        // Print the cleaned line
-        System.out.println(cleanedLine);
+        // Print the cleaned string
+        System.out.println(cleanedString);
     }
 
-    public static String removeCharactersAfterElement(String inputLine, String elementToRemoveAfter) {
-        int indexOfElement = inputLine.indexOf(elementToRemoveAfter);
+    public static String removeCharactersAfterElement(String inputString, String elementToRemoveAfter) {
+        int indexOfElement = inputString.indexOf(elementToRemoveAfter);
 
         if (indexOfElement != -1) {
             // Use substring to remove characters after the element
-            return inputLine.substring(0, indexOfElement + elementToRemoveAfter.length());
+            return inputString.substring(0, indexOfElement + elementToRemoveAfter.length());
         } else {
-            // Element not found, return the original line
-            return inputLine;
+            // Element not found, return the original string
+            return inputString;
         }
     }
 }
