@@ -1,54 +1,33 @@
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
+import java.io.*;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.StringReader;
-
-public class DOMElementsToString {
+public class PrintToCaptureString {
     public static void main(String[] args) {
+        // Create a ByteArrayOutputStream to capture the printed content
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        // Create a PrintStream to write to the ByteArrayOutputStream
+        PrintStream printStream = new PrintStream(outputStream);
+
+        // Redirect the standard output to the PrintStream
+        System.setOut(printStream);
+
+        // Now, anything printed to System.out will be captured in the outputStream
+
+        // Example: Printing "Hello, world!"
+        System.out.println("Hello, world!");
+
+        // Get the captured output as a string
+        String capturedOutput = outputStream.toString();
+
+        // Print the captured output
+        System.out.println("Captured Output: " + capturedOutput);
+
+        // Close the PrintStream and ByteArrayOutputStream
+        printStream.close();
         try {
-            // Your XML string
-            String xmlString = "<root><item><name>Item 1</name><price>10.00</price></item><item><name>Item 2</name><price>15.00</price></item></root>";
-
-            // Create a DocumentBuilder
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-
-            // Parse the XML string
-            Document document = builder.parse(new InputSource(new StringReader(xmlString)));
-
-            // Get all elements in the DOM and convert to a string
-            String allElementsAsString = elementsToString(document.getDocumentElement(), "");
-
-            System.out.println("All elements in the DOM:\n" + allElementsAsString);
-        } catch (Exception e) {
+            outputStream.close();
+        } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public static String elementsToString(Element element, String indent) {
-        StringBuilder result = new StringBuilder();
-        result.append(indent).append("<").append(element.getTagName()).append(">\n");
-
-        NodeList children = element.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            Node child = children.item(i);
-            if (child instanceof Element) {
-                result.append(elementsToString((Element) child, indent + "  "));
-            }
-        }
-
-        String textContent = element.getTextContent().trim();
-        if (!textContent.isEmpty()) {
-            result.append(indent).append("  ").append(textContent).append("\n");
-        }
-
-        result.append(indent).append("</").append(element.getTagName()).append(">\n");
-
-        return result.toString();
     }
 }
