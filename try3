@@ -1,27 +1,45 @@
-public class RemoveCharactersAfterElement {
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.StringReader;
+
+public class XMLToDOM {
     public static void main(String[] args) {
-        // Your input string
-        String inputString = "";
+        try {
+            // Your XML content as a string
+            String xmlString = "<root><item><name>Item 1</name><price>10.00</price></item><item><name>Item 2</name><price>15.00</price></item></root>";
 
-        // Specify the element or marker after which you want to remove characters
-        String elementToRemoveAfter = "</";
+            // Create a DocumentBuilderFactory
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
 
-        // Remove characters after the element
-        String cleanedString = removeCharactersAfterElement(inputString, elementToRemoveAfter);
+            // Parse the XML string to create a DOM Document
+            Document document = builder.parse(new InputSource(new StringReader(xmlString)));
 
-        // Print the cleaned string
-        System.out.println(cleanedString);
+            // Print the XML content in a readable format
+            printDOM(document.getDocumentElement(), "");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public static String removeCharactersAfterElement(String inputString, String elementToRemoveAfter) {
-        int indexOfElement = inputString.indexOf(elementToRemoveAfter);
-
-        if (indexOfElement != -1) {
-            // Use substring to remove characters after the element
-            return inputString.substring(0, indexOfElement + elementToRemoveAfter.length());
-        } else {
-            // Element not found, return the original string
-            return inputString;
+    // Recursively print the DOM structure in a readable format
+    public static void printDOM(Element element, String indent) {
+        System.out.println(indent + "<" + element.getTagName() + ">");
+        NodeList childNodes = element.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            if (childNodes.item(i) instanceof Element) {
+                printDOM((Element) childNodes.item(i), indent + "  ");
+            } else if (childNodes.item(i).getNodeType() == org.w3c.dom.Node.TEXT_NODE) {
+                String text = childNodes.item(i).getTextContent().trim();
+                if (!text.isEmpty()) {
+                    System.out.println(indent + "  " + text);
+                }
+            }
         }
+        System.out.println(indent + "</" + element.getTagName() + ">");
     }
 }
