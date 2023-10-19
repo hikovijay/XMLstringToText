@@ -1,34 +1,6 @@
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+int rowIndex = 0;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.File;
-import java.io.FileOutputStream;
-
-public class DOMElementToExcel {
-    public static void main(String[] args) {
-        try {
-            // Load your DOM document
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document doc = builder.parse(new File("your_dom_data.xml"));
-
-            // Create a new Excel workbook
-            Workbook workbook = new XSSFWorkbook();
-            Sheet sheet = workbook.createSheet("DOMData");
-
-            // Get the root element or any specific element you want to export
-            Element root = doc.getDocumentElement();
-
-            // Create a row index to track the row number
-            int rowIndex = 0;
-
-            // Process child elements and add data to Excel
+            // Process child elements and add data to Excel in columns
             NodeList elements = root.getChildNodes();
             for (int i = 0; i < elements.getLength(); i++) {
                 Node elementNode = elements.item(i);
@@ -44,25 +16,12 @@ public class DOMElementToExcel {
                 Row row = sheet.createRow(rowIndex++);
 
                 // Process and add data to Excel cells
-                // Here, we add the element name and text content as an example
-                String elementName = element.getTagName();
                 String elementText = element.getTextContent();
 
-                Cell cell1 = row.createCell(0);
-                cell1.setCellValue(elementName);
-
-                Cell cell2 = row.createCell(1);
-                cell2.setCellValue(elementText);
+                String[] lines = elementText.split("\n");
+                int columnIndex = 0;
+                for (String line : lines) {
+                    Cell cell = row.createCell(columnIndex++);
+                    cell.setCellValue(line);
+                }
             }
-
-            // Save the Excel file
-            FileOutputStream out = new FileOutputStream("dom_element_data.xlsx");
-            workbook.write(out);
-            out.close();
-
-            System.out.println("DOM element data has been saved to dom_element_data.xlsx");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-}
