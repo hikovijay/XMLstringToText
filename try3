@@ -39,6 +39,6 @@ public class DOMElementToString {
             Element element = (Element) elements.item(0);
             return element.getTextContent();
         }
-        return null; // Element not found
+        return null; 
     }
 }
