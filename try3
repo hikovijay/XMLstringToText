@@ -1,21 +1,9 @@
-public static void getDataFromCustomColumns(String filePath, int sheetNumber, int[] columnNumbers) {
-        try (FileInputStream fileInputStream = new FileInputStream(filePath)) {
-            Workbook workbook = new XSSFWorkbook(fileInputStream);
-            Sheet sheet = workbook.getSheetAt(sheetNumber);
+String input = "<!-- Expected Results: KidneyFunctionRiskClass 'Pending(17)', UrineProteinAlbumRiskClass Null -->";
 
-            for (Row row : sheet) {
-                if (row != null) {
-                    for (int columnNumber : columnNumbers) {
-                        Cell cell = row.getCell(columnNumber);
+        // Remove unwanted parts and split by comma
+        String cleaned = input
+                .replace("<!-- Expected Results: ", "")
+                .replace(" Null -->", "")
+                .trim();
 
-                        if (cell != null) {
-                            String data = cell.toString();
-                            System.out.println("Data in Column " + (char) ('A' + columnNumber) + ": " + data);
-                        }
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+        String[] values = cleaned.split(",");
