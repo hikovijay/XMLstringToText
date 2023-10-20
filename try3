@@ -1,10 +1,22 @@
-for (int colNum = 0; colNum < 5; colNum++) {
-            sheet.autoSizeColumn(colNum);
-        }
+public static String getDataFromExcel(String filePath, String sheetName, int rowNum, int colNum) {
+        try (FileInputStream fileInputStream = new FileInputStream(filePath)) {
+            Workbook workbook = new XSSFWorkbook(fileInputStream);
+            Sheet sheet = workbook.getSheet(sheetName);
 
-        // Save the Excel file
-        try (FileOutputStream outputStream = new FileOutputStream("AutoAdjustColumnsExample.xlsx")) {
-            workbook.write(outputStream);
+            if (sheet != null) {
+                Row row = sheet.getRow(rowNum);
+
+                if (row != null) {
+                    Cell cell = row.getCell(colNum);
+
+                    if (cell != null) {
+                        return cell.toString();
+                    }
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return null; // Return null if the data is not found or an error occurs
+    }
