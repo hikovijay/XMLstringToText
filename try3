@@ -1,45 +1,21 @@
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-
-public class ExcelDataFetcher {
-    public static String getDataFromExcel(String filePath, int sheetNumber, int rowNum, int colNum) {
+public static void getDataFromCustomColumns(String filePath, int sheetNumber, int[] columnNumbers) {
         try (FileInputStream fileInputStream = new FileInputStream(filePath)) {
             Workbook workbook = new XSSFWorkbook(fileInputStream);
             Sheet sheet = workbook.getSheetAt(sheetNumber);
 
-            if (sheet != null) {
-                Row row = sheet.getRow(rowNum);
-
+            for (Row row : sheet) {
                 if (row != null) {
-                    Cell cell = row.getCell(colNum);
+                    for (int columnNumber : columnNumbers) {
+                        Cell cell = row.getCell(columnNumber);
 
-                    if (cell != null) {
-                        return cell.toString();
+                        if (cell != null) {
+                            String data = cell.toString();
+                            System.out.println("Data in Column " + (char) ('A' + columnNumber) + ": " + data);
+                        }
                     }
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return null; // Return null if the data is not found or an error occurs
     }
-
-    public static void main(String[] args) {
-        String filePath = "YourExcelFile.xlsx"; // Change this to your Excel file path
-        int sheetNumber = 0; // Change this to the sheet number you want to fetch data from (0-based index)
-        int targetRow = 2; // Change this to the row you want to fetch data from (0-based index)
-        int targetColumn = 1; // Change this to the column you want to fetch data from (0-based index)
-
-        String data = getDataFromExcel(filePath, sheetNumber, targetRow, targetColumn);
-
-        if (data != null) {
-            System.out.println("Data in Row " + targetRow + ", Column " + targetColumn + ": " + data);
-        } else {
-            System.out.println("Data not found or an error occurred.");
-        }
-    }
-}
