@@ -1,42 +1,10 @@
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+for (int colNum = 0; colNum < 5; colNum++) {
+            sheet.autoSizeColumn(colNum);
+        }
 
-import java.io.FileInputStream;
-import java.io.IOException;
-
-public class ExcelColumnDataFetcher {
-    public static String fetchExcelColumnDataToString(String filePath, int sheetNumber, int columnNumber) {
-        StringBuilder dataStringBuilder = new StringBuilder();
-
-        try {
-            FileInputStream fileInputStream = new FileInputStream(filePath);
-            Workbook workbook = new XSSFWorkbook(fileInputStream);
-            Sheet sheet = workbook.getSheetAt(sheetNumber);
-
-            for (Row row : sheet) {
-                Cell cell = row.getCell(columnNumber);
-                if (cell != null) {
-                    if (cell.getCellType() == CellType.STRING) {
-                        String cellValue = cell.getStringCellValue();
-                        dataStringBuilder.append(cellValue).append("\n"); // Append cell data to the string with a new line
-                    }
-                }
-            }
-
-            workbook.close();
+        // Save the Excel file
+        try (FileOutputStream outputStream = new FileOutputStream("AutoAdjustColumnsExample.xlsx")) {
+            workbook.write(outputStream);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return dataStringBuilder.toString();
-    }
-
-    public static void main(String[] args) {
-        String filePath = "your_excel_file.xlsx"; // Replace with your file path
-        int sheetNumber = 0; // Replace with the sheet number you want to read
-        int columnNumber = 1; // Replace with the column number you want to fetch (0 for the first column)
-
-        String columnData = fetchExcelColumnDataToString(filePath, sheetNumber, columnNumber);
-        System.out.println(columnData);
-    }
-}
