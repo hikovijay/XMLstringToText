@@ -1,9 +1,29 @@
-String input = "<!-- Expected Results: KidneyFunctionRiskClass 'Pending(17)', UrineProteinAlbumRiskClass Null -->";
+// Open an existing Excel file
+        try (FileInputStream fileInputStream = new FileInputStream("YourExistingExcelFile.xlsx");
+             Workbook workbook = new XSSFWorkbook(fileInputStream)) {
 
-        // Remove unwanted parts and split by comma
-        String cleaned = input
-                .replace("<!-- Expected Results: ", "")
-                .replace(" Null -->", "")
-                .trim();
+            // Get the desired sheet by name or index
+            Sheet sheet = workbook.getSheet("YourSheetName"); // Change to your sheet name or index
 
-        String[] values = cleaned.split(",");
+            // Write split values to an existing Excel sheet and a specified column
+            int columnNumber = 0; // Change to your desired column number
+            int currentRow = 0; // Specify the row to start writing
+
+            for (String value : values) {
+                Row row = sheet.getRow(currentRow);
+                if (row == null) {
+                    row = sheet.createRow(currentRow);
+                }
+
+                Cell cell = row.createCell(columnNumber);
+                cell.setCellValue(value);
+                currentRow++;
+            }
+
+            // Save the changes to the Excel file
+            try (FileOutputStream fileOutputStream = new FileOutputStream("YourExistingExcelFile.xlsx")) {
+                workbook.write(fileOutputStream);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
