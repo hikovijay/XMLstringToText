@@ -1,29 +1,17 @@
-// Open an existing Excel file
-        try (FileInputStream fileInputStream = new FileInputStream("YourExistingExcelFile.xlsx");
-             Workbook workbook = new XSSFWorkbook(fileInputStream)) {
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
-            // Get the desired sheet by name or index
-            Sheet sheet = workbook.getSheet("YourSheetName"); // Change to your sheet name or index
+public class RemoveCharacters {
+    public static String removeChars(String input, String charsToRemove) {
+        String regex = "[" + Pattern.quote(charsToRemove) + "]";
+        return input.replaceAll(regex, "");
+    }
 
-            // Write split values to an existing Excel sheet and a specified column
-            int columnNumber = 0; // Change to your desired column number
-            int currentRow = 0; // Specify the row to start writing
+    public static void main(String[] args) {
+        String originalString = "Hello, World!";
+        String charactersToRemove = "loW";
 
-            for (String value : values) {
-                Row row = sheet.getRow(currentRow);
-                if (row == null) {
-                    row = sheet.createRow(currentRow);
-                }
-
-                Cell cell = row.createCell(columnNumber);
-                cell.setCellValue(value);
-                currentRow++;
-            }
-
-            // Save the changes to the Excel file
-            try (FileOutputStream fileOutputStream = new FileOutputStream("YourExistingExcelFile.xlsx")) {
-                workbook.write(fileOutputStream);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        String modifiedString = removeChars(originalString, charactersToRemove);
+        System.out.println(modifiedString); // Output: "He, rd!"
+    }
+}
