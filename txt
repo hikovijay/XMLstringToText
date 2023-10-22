@@ -1,5 +1,46 @@
- int startIndex = str.indexOf(target);
-        if (startIndex != -1) {
-            int endIndex = startIndex + target.length();
-            str.replace(startIndex, endIndex, replacement);
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFRichTextString;
+
+import java.io.*;
+
+public class ExcelColumnSplitter {
+    public static void main(String[] args) {
+        String filePath = "your_excel_file.xlsx"; // Replace with the path to your Excel file
+        int columnToSplit = 0; // The column you want to split (0-based index)
+        
+        try (FileInputStream fis = new FileInputStream(filePath);
+             Workbook workbook = new XSSFWorkbook(fis)) {
+
+            Sheet sheet = workbook.getSheetAt(0); // You can specify the sheet by index or name
+            
+            // Iterate over the rows in the column
+            for (Row row : sheet) {
+                Cell cell = row.getCell(columnToSplit);
+
+                if (cell != null) {
+                    String cellValue = cell.getStringCellValue();
+                    String[] parts = cellValue.split(" ");
+
+                    if (parts.length > 1) {
+                        // Split the cell value by space and set the rest of the text to the next cell
+                        cell.setCellValue(parts[0]); // Set the first part back to the current cell
+
+                        // Check if the next cell exists, if not, create it
+                        Cell nextCell = row.createCell(columnToSplit + 1, CellType.STRING);
+                        nextCell.setCellValue(new XSSFRichTextString(parts[1])); // Set the second part to the next cell
+                    }
+                }
+            }
+
+            // Save the modified workbook
+            try (FileOutputStream fos = new FileOutputStream(filePath)) {
+                workbook.write(fos);
+            }
+
+            System.out.println("Excel column split and updated successfully.");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
+}
