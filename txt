@@ -1,52 +1,12 @@
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFRichTextString;
+CellStyle style = workbook.createCellStyle();
+                style.setAlignment(HorizontalAlignment.CENTER);
+                style.setVerticalAlignment(VerticalAlignment.CENTER);
 
-import java.io.*;
+                Font font = workbook.createFont();
+                font.setBold(true);
+                font.setFontHeightInPoints((short) 14);
+                style.setFont(font);
 
-public class ExcelColumnSplitterWithStartRowIndex {
-    public static void main(String[] args) {
-        String filePath = "your_excel_file.xlsx"; // Replace with the path to your Excel file
-        int columnToSplit = 0; // The column you want to split (0-based index)
-        int startRowIndex = 2; // The row where you want to start splitting (0-based index)
-
-        try (FileInputStream fis = new FileInputStream(filePath);
-             Workbook workbook = new XSSFWorkbook(fis)) {
-
-            Sheet sheet = workbook.getSheetAt(0); // You can specify the sheet by index or name
-
-            // Iterate over the rows in the specified column starting from the startRowIndex
-            for (int rowNum = startRowIndex; rowNum <= sheet.getLastRowNum(); rowNum++) {
-                Row row = sheet.getRow(rowNum);
-                if (row == null) {
-                    continue;
+                for (Cell cell : firstRow) {
+                    cell.setCellStyle(style);
                 }
-
-                Cell cell = row.getCell(columnToSplit);
-
-                if (cell != null) {
-                    String cellValue = cell.getStringCellValue();
-                    String[] parts = cellValue.split(" ");
-
-                    if (parts.length > 1) {
-                        // Split the cell value by space and set the first part back to the current cell
-                        cell.setCellValue(parts[0]);
-
-                        // Create the next cell (if not exists) and set the second part in it
-                        Cell nextCell = row.createCell(columnToSplit + 1, CellType.STRING);
-                        nextCell.setCellValue(new XSSFRichTextString(parts[1]));
-                    }
-                }
-            }
-
-            // Save the modified workbook
-            try (FileOutputStream fos = new FileOutputStream(filePath)) {
-                workbook.write(fos);
-            }
-
-            System.out.println("Excel column split and updated successfully.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-}
