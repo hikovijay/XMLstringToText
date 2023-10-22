@@ -1,23 +1,59 @@
-for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+public class ExcelSearchAndUpdateColumnG {
+    public static void main(String[] args) {
+        String filePath = "your_excel_file.xlsx"; // Replace with the path to your Excel file
+
+        try (FileInputStream fis = new FileInputStream(filePath);
+             Workbook workbook = new XSSFWorkbook(fis)) {
+            Sheet sheet = workbook.getSheetAt(0); // You can specify the sheet by index or name
+
+            for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
                 Row row = sheet.getRow(rowNum);
                 if (row != null) {
-                    // Get the cell in column B
+                    // Get the value from column B (assuming it's a String)
                     Cell cellB = row.getCell(1); // Column B is index 1
+                    String valueB = cellB.getStringCellValue();
 
-                    // Check the data type of cell B (assuming it's a string)
-                    if (cellB.getCellType() == CellType.STRING) {
-                        String valueB = cellB.getStringCellValue();
+                    // Search for the value in column G (assuming it's a String)
+                    boolean found = false;
+                    for (int searchRow = 1; searchRow <= sheet.getLastRowNum(); searchRow++) {
+                        Row searchRowObj = sheet.getRow(searchRow);
+                        Cell cellG = searchRowObj.getCell(6); // Column G is index 6
+                        String valueG = cellG.getStringCellValue();
+                        if (valueG.equals(valueB)) {
+                            found = true;
+                            break;
+                        }
+                    }
 
-                        // Compare valueB with the string array
-                        for (int i = 0; i < stringArray.length; i++) {
-                            if (valueB.equals(stringArray[i]) && i < stringArray.length - 1) {
-                                // Match found, get the next string from the array and update column D
-                                String valueD = stringArray[i + 1];
-                                Cell cellD = row.createCell(3, CellType.STRING); // Column D is index 3
-                                cellD.setCellValue(valueD);
-                                break; // Exit the loop after a match is found
-                            }
+                    if (found && rowNum < sheet.getLastRowNum()) {
+                        // Get the value from the next row in column G and update column D
+                        Row nextRow = sheet.getRow(rowNum + 1);
+                        Cell cellGinNextRow = nextRow.getCell(6); // Column G in the next row
+                        if (cellGinNextRow != null && cellGinNextRow.getCellType() == CellType.STRING) {
+                            String valueGinNextRow = cellGinNextRow.getStringCellValue();
+
+                            Cell cellD = row.createCell(3, CellType.STRING); // Column D is index 3
+                            cellD.setCellValue(valueGinNextRow);
                         }
                     }
                 }
             }
+
+            // Save the modified workbook
+            try (FileOutputStream fos = new FileOutputStream(filePath)) {
+                workbook.write(fos);
+            }
+
+            System.out.println("Search and update from column G completed.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
