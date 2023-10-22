@@ -1,10 +1,54 @@
-for (int i = 0; i < stringList.size(); i++) {
-                Row row = sheet.getRow(startRow + i);
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+
+import java.io.*;
+
+public class ExcelWriter {
+
+    public static void writeStringToExcel(String filePath, String sheetName, int rowNumber, int cellNumber, String value) {
+        try (FileInputStream fis = new FileInputStream(filePath)) {
+            Workbook workbook;
+            if (filePath.endsWith(".xlsx")) {
+                workbook = new XSSFWorkbook(fis);
+            } else if (filePath.endsWith(".xls")) {
+                workbook = new HSSFWorkbook(fis);
+            } else {
+                throw new IllegalArgumentException("Unsupported file format");
+            }
+
+            Sheet sheet = workbook.getSheet(sheetName);
+
+            if (sheet != null) {
+                Row row = sheet.getRow(rowNumber);
                 if (row == null) {
-                    // If the row doesn't exist, create it
-                    row = sheet.createRow(startRow + i);
+                    row = sheet.createRow(rowNumber);
                 }
 
-                Cell cell = row.createCell(targetColumn);
-                cell.setCellValue(stringList.get(i));
+                Cell cell = row.createCell(cellNumber);
+                cell.setCellValue(value);
+
+                try (FileOutputStream fos = new FileOutputStream(filePath)) {
+                    workbook.write(fos);
+                }
+
+                System.out.println("Value '" + value + "' written to sheet '" + sheetName + "', row " + rowNumber + ", column " + cellNumber);
+            } else {
+                System.out.println("Sheet not found: " + sheetName);
             }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        String filePath = "your_excel_file.xlsx"; // Replace with the path to your Excel file
+        String sheetName = "Sheet1"; // Replace with the name of the sheet
+        int rowNumber = 2; // Row where you want to write the value (0-based index)
+        int cellNumber = 3; // Column where you want to write the value (0-based index)
+        String valueToWrite = "Hello, Excel!"; // The value you want to write
+
+        writeStringToExcel(filePath, sheetName, rowNumber, cellNumber, valueToWrite);
+    }
+}
