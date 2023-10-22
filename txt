@@ -1,4 +1,8 @@
-String replacedString = inputString
-                .replace("[", "")
-                .replace("]", "")
-                .replace(",", "");
+if (areCellsMerged(sheet, row1, col1, row2, col2)) {
+                System.out.println("Cells are already merged.");
+            } else {
+                // Merge the cells
+                CellRangeAddress mergedRegion = new CellRangeAddress(row1, row2, col1, col2);
+                sheet.addMergedRegion(mergedRegion);
+                System.out.println("Cells merged successfully.");
+            }
