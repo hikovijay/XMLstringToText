@@ -1,14 +1,59 @@
-if (sheet != null) {
-                // Clear the sheet by removing all rows
-                while (sheet.getLastRowNum() >= 0) {
-                    sheet.removeRow(sheet.getRow(sheet.getLastRowNum()));
-                }
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-                try (FileOutputStream fos = new FileOutputStream(filePath)) {
-                    workbook.write(fos);
-                }
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
-                System.out.println("Sheet cleared successfully.");
-            } else {
-                System.out.println("Sheet not found.");
+public class ExcelSearchAndUpdate {
+    public static void main(String[] args) {
+        String filePath = "your_excel_file.xlsx"; // Replace with the path to your Excel file
+
+        try (FileInputStream fis = new FileInputStream(filePath);
+             Workbook workbook = new XSSFWorkbook(fis)) {
+            Sheet sheet = workbook.getSheetAt(0); // You can specify the sheet by index or name
+
+            for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
+                Row row = sheet.getRow(rowNum);
+                if (row != null) {
+                    // Get the value from column B (assuming it's a String)
+                    Cell cellB = row.getCell(1); // Column B is index 1
+                    String valueB = cellB.getStringCellValue();
+
+                    // Search for the value in column G (assuming it's a String)
+                    boolean found = false;
+                    int foundRow = -1;
+                    for (int searchRow = 1; searchRow <= sheet.getLastRowNum(); searchRow++) {
+                        Row searchRowObj = sheet.getRow(searchRow);
+                        Cell cellG = searchRowObj.getCell(6); // Column G is index 6
+                        String valueG = cellG.getStringCellValue();
+                        if (valueG.equals(valueB)) {
+                            found = true;
+                            foundRow = searchRow;
+                            break;
+                        }
+                    }
+
+                    if (found && foundRow < sheet.getLastRowNum()) {
+                        // Get the value from the next row in column G and update column D
+                        Row nextRow = sheet.getRow(foundRow + 1);
+                        Cell cellGinNextRow = nextRow.getCell(6); // Column G in the next row
+                        String valueGinNextRow = cellGinNextRow.getStringCellValue();
+
+                        Cell cellD = row.createCell(3); // Column D is index 3
+                        cellD.setCellValue(valueGinNextRow);
+                    }
+                }
             }
+
+            // Save the modified workbook
+            try (FileOutputStream fos = new FileOutputStream(filePath)) {
+                workbook.write(fos);
+            }
+
+            System.out.println("Search and update completed.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
