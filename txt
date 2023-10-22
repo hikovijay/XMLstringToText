@@ -1,43 +1,8 @@
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
-import java.io.*;
-
-public class ExcelWriter {
-    public static void main(String[] args) {
-        String filePath = "your_existing_excel.xlsx"; // Replace with the path to your existing Excel file
-        String sheetName = "NewSheet";
-        int startRow = 2; // Row number to start writing data
-        int startColumn = 1; // Column number to start writing data
-        StringBuffer dataBuffer = new StringBuffer();
-        dataBuffer.append("Data1\nData2\nData3"); // Sample data to write
-
-        try (FileInputStream fis = new FileInputStream(filePath);
-             Workbook workbook = new XSSFWorkbook(fis)) {
-
-            // Create a new sheet in the existing workbook
-            Sheet newSheet = workbook.createSheet(sheetName);
-
-            // Split the data from the StringBuffer into an array of lines
-            String[] lines = dataBuffer.toString().split("\n");
-
-            // Write data to the new sheet starting from the specified row and column
-            int currentRow = startRow;
-            for (String line : lines) {
-                Row row = newSheet.createRow(currentRow - 1); // Rows are 0-based
-                Cell cell = row.createCell(startColumn - 1); // Columns are 0-based
-                cell.setCellValue(line);
-                currentRow++;
+Row row = sheet.getRow(targetRow);
+            if (row == null) {
+                // If the row doesn't exist, create it
+                row = sheet.createRow(targetRow);
             }
 
-            // Save the modified workbook
-            try (FileOutputStream fos = new FileOutputStream(filePath)) {
-                workbook.write(fos);
-            }
-
-            System.out.println("Data written to the new sheet successfully.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-}
+            Cell cell = row.createCell(targetColumn);
+            cell.setCellValue(dataToWrite);
