@@ -1,8 +1,4 @@
-Row row = sheet.getRow(targetRow);
-            if (row == null) {
-                // If the row doesn't exist, create it
-                row = sheet.createRow(targetRow);
-            }
-
-            Cell cell = row.createCell(targetColumn);
-            cell.setCellValue(dataToWrite);
+String replacedString = inputString
+                .replace("[", "")
+                .replace("]", "")
+                .replace(",", "");
