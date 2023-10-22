@@ -1,9 +1,10 @@
-    public static boolean areCellsMerged(Sheet sheet, int row1, int col1, int row2, int col2) {
-        for (int i = 0; i < sheet.getNumMergedRegions(); i++) {
-            CellRangeAddress mergedRegion = sheet.getMergedRegion(i);
-            if (mergedRegion.isInRange(row1, col1) && mergedRegion.isInRange(row2, col2)) {
-                return true;
+for (int i = 0; i < stringList.size(); i++) {
+                Row row = sheet.getRow(startRow + i);
+                if (row == null) {
+                    // If the row doesn't exist, create it
+                    row = sheet.createRow(startRow + i);
+                }
+
+                Cell cell = row.createCell(targetColumn);
+                cell.setCellValue(stringList.get(i));
             }
-        }
-        return false;
-    }
