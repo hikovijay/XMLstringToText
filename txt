@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class ExcelSearchAndUpdateColumnG {
+public class ExcelSearchAndUpdate {
     public static void main(String[] args) {
         String filePath = "your_excel_file.xlsx"; // Replace with the path to your Excel file
 
@@ -13,35 +13,27 @@ public class ExcelSearchAndUpdateColumnG {
              Workbook workbook = new XSSFWorkbook(fis)) {
             Sheet sheet = workbook.getSheetAt(0); // You can specify the sheet by index or name
 
+            // Get the value from cell B2
+            Row rowB2 = sheet.getRow(1); // B2 corresponds to row 2 (0-based index)
+            Cell cellB2 = rowB2.getCell(1); // B2 corresponds to column B (0-based index)
+            String valueB2 = cellB2.getStringCellValue();
+
+            // Search for the value in column G (assuming it's a String column)
             for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
                 Row row = sheet.getRow(rowNum);
-                if (row != null) {
-                    // Get the value from column B (assuming it's a String)
-                    Cell cellB = row.getCell(1); // Column B is index 1
-                    String valueB = cellB.getStringCellValue();
+                Cell cellG = row.getCell(6); // Column G is index 6
+                String valueG = cellG.getStringCellValue();
 
-                    // Search for the value in column G (assuming it's a String)
-                    boolean found = false;
-                    for (int searchRow = 1; searchRow <= sheet.getLastRowNum(); searchRow++) {
-                        Row searchRowObj = sheet.getRow(searchRow);
-                        Cell cellG = searchRowObj.getCell(6); // Column G is index 6
-                        String valueG = cellG.getStringCellValue();
-                        if (valueG.equals(valueB)) {
-                            found = true;
-                            break;
-                        }
-                    }
+                // Compare valueB2 with valueG
+                if (valueB2.equals(valueG) && rowNum < sheet.getLastRowNum()) {
+                    // Get the value from the next line's column cell and update column D
+                    Row nextRow = sheet.getRow(rowNum + 1);
+                    Cell cellGNext = nextRow.getCell(6); // Column G in the next row
+                    if (cellGNext.getCellType() == CellType.STRING) {
+                        String valueD = cellGNext.getStringCellValue();
 
-                    if (found && rowNum < sheet.getLastRowNum()) {
-                        // Get the value from the next row in column G and update column D
-                        Row nextRow = sheet.getRow(rowNum + 1);
-                        Cell cellGinNextRow = nextRow.getCell(6); // Column G in the next row
-                        if (cellGinNextRow != null && cellGinNextRow.getCellType() == CellType.STRING) {
-                            String valueGinNextRow = cellGinNextRow.getStringCellValue();
-
-                            Cell cellD = row.createCell(3, CellType.STRING); // Column D is index 3
-                            cellD.setCellValue(valueGinNextRow);
-                        }
+                        Cell cellD = row.createCell(3, CellType.STRING); // Column D is index 3
+                        cellD.setCellValue(valueD);
                     }
                 }
             }
@@ -51,7 +43,7 @@ public class ExcelSearchAndUpdateColumnG {
                 workbook.write(fos);
             }
 
-            System.out.println("Search and update from column G completed.");
+            System.out.println("Search and update completed.");
         } catch (IOException e) {
             e.printStackTrace();
         }
