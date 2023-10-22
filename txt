@@ -1,65 +1,41 @@
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import java.io.FileInputStream;
-import java.io.IOException;
 
-public class ExcelDataReader {
-    public static String readExcelToString(String filePath, String sheetName) throws IOException {
-        // Create a FileInputStream to read the Excel file
-        FileInputStream fis = new FileInputStream(filePath);
-        Workbook workbook = null;
-        String excelData = "";
+import java.io.*;
 
-        // Determine if the file is in XLS or XLSX format and create the appropriate workbook
-        if (filePath.endsWith(".xlsx")) {
-            workbook = new XSSFWorkbook(fis);
-        } else if (filePath.endsWith(".xls")) {
-            workbook = new HSSFWorkbook(fis);
-        }
-
-        // Get the sheet by name
-        Sheet sheet = workbook.getSheet(sheetName);
-
-        if (sheet != null) {
-            // Iterate through rows and cells to read data
-            for (Row row : sheet) {
-                for (Cell cell : row) {
-                    // Check the cell type and extract data accordingly
-                    switch (cell.getCellType()) {
-                        case STRING:
-                            excelData += cell.getStringCellValue() + "\t";
-                            break;
-                        case NUMERIC:
-                            excelData += cell.getNumericCellValue() + "\t";
-                            break;
-                        case BOOLEAN:
-                            excelData += cell.getBooleanCellValue() + "\t";
-                            break;
-                        case BLANK:
-                            excelData += "\t";
-                            break;
-                        default:
-                            excelData += "\t";
-                    }
-                }
-                excelData += "\n"; // Newline for the next row
-            }
-        }
-
-        fis.close();
-        return excelData;
-    }
-
+public class ExcelWriter {
     public static void main(String[] args) {
-        try {
-            String filePath = "your_excel_file.xlsx"; // Replace with your Excel file path
-            String sheetName = "Sheet1"; // Replace with the sheet name you want to read
+        String filePath = "your_existing_excel.xlsx"; // Replace with the path to your existing Excel file
+        String sheetName = "NewSheet";
+        int startRow = 2; // Row number to start writing data
+        int startColumn = 1; // Column number to start writing data
+        StringBuffer dataBuffer = new StringBuffer();
+        dataBuffer.append("Data1\nData2\nData3"); // Sample data to write
 
-            String excelData = readExcelToString(filePath, sheetName);
-            System.out.println(excelData);
+        try (FileInputStream fis = new FileInputStream(filePath);
+             Workbook workbook = new XSSFWorkbook(fis)) {
+
+            // Create a new sheet in the existing workbook
+            Sheet newSheet = workbook.createSheet(sheetName);
+
+            // Split the data from the StringBuffer into an array of lines
+            String[] lines = dataBuffer.toString().split("\n");
+
+            // Write data to the new sheet starting from the specified row and column
+            int currentRow = startRow;
+            for (String line : lines) {
+                Row row = newSheet.createRow(currentRow - 1); // Rows are 0-based
+                Cell cell = row.createCell(startColumn - 1); // Columns are 0-based
+                cell.setCellValue(line);
+                currentRow++;
+            }
+
+            // Save the modified workbook
+            try (FileOutputStream fos = new FileOutputStream(filePath)) {
+                workbook.write(fos);
+            }
+
+            System.out.println("Data written to the new sheet successfully.");
         } catch (IOException e) {
             e.printStackTrace();
         }
