@@ -1,42 +1,67 @@
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import org.xml.sax.InputSource;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import java.io.FileInputStream;
+import java.io.IOException;
 
-public class XMLToString {
-    public static void main(String[] args) {
-        String xmlString = "<root><element1>Value 1</element1><element2>Value 2</element2></root>";
-        
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            InputSource inputSource = new InputSource(new StringReader(xmlString));
-            Document document = builder.parse(inputSource);
+public class ExcelDataReader {
+    public static String readExcelToString(String filePath, String sheetName) throws IOException {
+        // Create a FileInputStream to read the Excel file
+        FileInputStream fis = new FileInputStream(filePath);
+        Workbook workbook = null;
+        String excelData = "";
 
-            // Normalize the document to combine adjacent text nodes
-            document.getDocumentElement().normalize();
-
-            String textContent = extractTextContent(document.getDocumentElement());
-            System.out.println(textContent);
-        } catch (Exception e) {
-            e.printStackTrace();
+        // Determine if the file is in XLS or XLSX format and create the appropriate workbook
+        if (filePath.endsWith(".xlsx")) {
+            workbook = new XSSFWorkbook(fis);
+        } else if (filePath.endsWith(".xls")) {
+            workbook = new HSSFWorkbook(fis);
         }
-    }
 
-    public static String extractTextContent(Node node) {
-        StringBuilder textContent = new StringBuilder();
+        // Get the sheet by name
+        Sheet sheet = workbook.getSheet(sheetName);
 
-        if (node.getNodeType() == Node.TEXT_NODE) {
-            textContent.append(node.getNodeValue());
-        } else if (node.hasChildNodes()) {
-            NodeList childNodes = node.getChildNodes();
-            for (int i = 0; i < childNodes.getLength(); i++) {
-                textContent.append(extractTextContent(childNodes.item(i)));
+        if (sheet != null) {
+            // Iterate through rows and cells to read data
+            for (Row row : sheet) {
+                for (Cell cell : row) {
+                    // Check the cell type and extract data accordingly
+                    switch (cell.getCellType()) {
+                        case STRING:
+                            excelData += cell.getStringCellValue() + "\t";
+                            break;
+                        case NUMERIC:
+                            excelData += cell.getNumericCellValue() + "\t";
+                            break;
+                        case BOOLEAN:
+                            excelData += cell.getBooleanCellValue() + "\t";
+                            break;
+                        case BLANK:
+                            excelData += "\t";
+                            break;
+                        default:
+                            excelData += "\t";
+                    }
+                }
+                excelData += "\n"; // Newline for the next row
             }
         }
 
-        return textContent.toString();
+        fis.close();
+        return excelData;
+    }
+
+    public static void main(String[] args) {
+        try {
+            String filePath = "your_excel_file.xlsx"; // Replace with your Excel file path
+            String sheetName = "Sheet1"; // Replace with the sheet name you want to read
+
+            String excelData = readExcelToString(filePath, sheetName);
+            System.out.println(excelData);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
