@@ -18,6 +18,9 @@ public class ExcelSearchAndUpdate {
             Cell cellB2 = rowB2.getCell(1); // B2 corresponds to column B (0-based index)
             String valueB2 = cellB2.getStringCellValue();
 
+            // Initialize a variable to track the matching row
+            int matchingRow = -1;
+
             // Search for the value in column G (assuming it's a String column)
             for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
                 Row row = sheet.getRow(rowNum);
@@ -25,16 +28,22 @@ public class ExcelSearchAndUpdate {
                 String valueG = cellG.getStringCellValue();
 
                 // Compare valueB2 with valueG
-                if (valueB2.equals(valueG) && rowNum < sheet.getLastRowNum()) {
-                    // Get the value from the next line's column cell and update column D
-                    Row nextRow = sheet.getRow(rowNum + 1);
-                    Cell cellGNext = nextRow.getCell(6); // Column G in the next row
-                    if (cellGNext.getCellType() == CellType.STRING) {
-                        String valueD = cellGNext.getStringCellValue();
+                if (valueB2.equals(valueG)) {
+                    matchingRow = rowNum;
+                    break;
+                }
+            }
 
-                        Cell cellD = row.createCell(3, CellType.STRING); // Column D is index 3
-                        cellD.setCellValue(valueD);
-                    }
+            // If a match is found, get the value from the next line's column cell and update column D
+            if (matchingRow != -1 && matchingRow < sheet.getLastRowNum()) {
+                Row nextRow = sheet.getRow(matchingRow + 1);
+                Cell cellGNext = nextRow.getCell(6); // Column G in the next row
+                if (cellGNext.getCellType() == CellType.STRING) {
+                    String valueD = cellGNext.getStringCellValue();
+
+                    Row rowD2 = sheet.getRow(1); // D2 corresponds to row 2 (0-based index)
+                    Cell cellD2 = rowD2.createCell(3, CellType.STRING); // Column D is index 3
+                    cellD2.setCellValue(valueD);
                 }
             }
 
