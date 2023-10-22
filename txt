@@ -1,12 +1,14 @@
-CellStyle style = workbook.createCellStyle();
-                style.setAlignment(HorizontalAlignment.CENTER);
-                style.setVerticalAlignment(VerticalAlignment.CENTER);
-
-                Font font = workbook.createFont();
-                font.setBold(true);
-                font.setFontHeightInPoints((short) 14);
-                style.setFont(font);
-
-                for (Cell cell : firstRow) {
-                    cell.setCellStyle(style);
+if (sheet != null) {
+                // Clear the sheet by removing all rows
+                while (sheet.getLastRowNum() >= 0) {
+                    sheet.removeRow(sheet.getRow(sheet.getLastRowNum()));
                 }
+
+                try (FileOutputStream fos = new FileOutputStream(filePath)) {
+                    workbook.write(fos);
+                }
+
+                System.out.println("Sheet cleared successfully.");
+            } else {
+                System.out.println("Sheet not found.");
+            }
