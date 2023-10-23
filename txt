@@ -1,11 +1,56 @@
-int rowNumber = 2; // Row number (0-based index) where you want to write the value
-            int columnNumber = 1; // Column number (0-based index) where you want to write the value
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-            Row row = sheet.getRow(rowNumber);
-            if (row == null) {
-                row = sheet.createRow(rowNumber);
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+public class TraverseColumnBAndSearch {
+    public static void main(String[] args) {
+        String filePath = "your_excel_file.xlsx"; // Replace with the path to your Excel file
+
+        try (FileInputStream fis = new FileInputStream(filePath);
+             Workbook workbook = new XSSFWorkbook(fis)) {
+            Sheet sheet = workbook.getSheetAt(0); // You can specify the sheet by index or name
+
+            // Iterate through cells in column B starting from row 1
+            for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
+                Row row = sheet.getRow(rowNum);
+                Cell cellB = row.getCell(1); // Column B is index 1
+                if (cellB != null && cellB.getCellType() == CellType.STRING) {
+                    String valueB = cellB.getStringCellValue();
+
+                    // Search for valueB in the entire column G
+                    for (int searchRow = 1; searchRow <= sheet.getLastRowNum(); searchRow++) {
+                        Row searchRowObj = sheet.getRow(searchRow);
+                        Cell cellG = searchRowObj.getCell(6); // Column G is index 6
+                        if (cellG != null && cellG.getCellType() == CellType.STRING) {
+                            String valueG = cellG.getStringCellValue();
+
+                            if (valueB.equals(valueG) && searchRow < sheet.getLastRowNum()) {
+                                // Get the value from the next line's column cell and update column D
+                                Row nextRow = sheet.getRow(searchRow + 1);
+                                Cell cellGNext = nextRow.getCell(6); // Column G in the next row
+                                if (cellGNext != null && cellGNext.getCellType() == CellType.STRING) {
+                                    String valueD = cellGNext.getStringCellValue();
+
+                                    Cell cellD = row.createCell(3, CellType.STRING); // Column D is index 3
+                                    cellD.setCellValue(valueD);
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
-            String valueToWrite = "Your String Value"; // Replace with the value you want to write
-            Cell cell = row.createCell(columnNumber);
-            cell.setCellValue(valueToWrite);
+            // Save the modified workbook
+            try (FileOutputStream fos = new FileOutputStream(filePath)) {
+                workbook.write(fos);
+            }
+
+            System.out.println("Traverse and search completed.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
