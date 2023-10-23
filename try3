@@ -1,31 +1,52 @@
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class ExcelColumnComparison {
     public static void main(String[] args) {
         try {
             FileInputStream file = new FileInputStream("your_excel_file.xlsx");
             XSSFWorkbook workbook = new XSSFWorkbook(file);
-            XSSFSheet sheet = workbook.getSheetAt(0); // Assuming you are working with the first sheet
+            Sheet sheet = workbook.getSheetAt(0); // Assuming you are working with the first sheet
 
-            int numRows = sheet.getPhysicalNumberOfRows();
+            for (Row row : sheet) {
+                Cell cellB = row.getCell(1); // Assuming column B is the second column (0-based index)
+                Cell cellD = row.createCell(3, CellType.STRING); // Assuming column D is the fourth column
 
-            for (int rowIdx = 0; rowIdx < numRows; rowIdx++) {
-                XSSFRow row = sheet.getRow(rowIdx);
-                if (row == null) {
-                    continue;
-                }
-
-                XSSFCell cellB = row.getCell(1); // Assuming column B is the second column (0-based index)
-                XSSFCell cellD = row.createCell(3, CellType.STRING); // Assuming column D is the fourth column
-
-                if (cellB != null) {
+                if (cellB != null && cellB.getCellType() == CellType.STRING) {
                     String valueB = cellB.getStringCellValue();
-                    String valueG = findNextValueInColumnG(sheet, valueB, rowIdx);
-                    cellD.setCellValue(valueG);
+                    String targetValue = valueB;
+
+                    int numRows = sheet.getPhysicalNumberOfRows();
+                    int rowIndex = row.getRowNum();
+
+                    for (int rowIdx = rowIndex; rowIdx < numRows; rowIdx++) {
+                        Row nextRow = sheet.getRow(rowIdx);
+                        if (nextRow == null) {
+                            continue;
+                        }
+
+                        Cell cellG = nextRow.getCell(6); // Assuming column G is the seventh column (0-based index)
+
+                        if (cellG != null && cellG.getCellType() == CellType.STRING) {
+                            String valueG = cellG.getStringCellValue();
+                            if (valueG.contains(targetValue)) {
+                                if (rowIdx + 1 < numRows) {
+                                    Row nextRowG = sheet.getRow(rowIdx + 1);
+                                    if (nextRowG != null) {
+                                        Cell nextCellG = nextRowG.getCell(6);
+                                        if (nextCellG != null && nextCellG.getCellType() == CellType.STRING) {
+                                            cellD.setCellValue(nextCellG.getStringCellValue());
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
@@ -35,30 +56,8 @@ public class ExcelColumnComparison {
             outFile.close();
             workbook.close();
             file.close();
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private static String findNextValueInColumnG(XSSFSheet sheet, String targetValue, int rowIndex) {
-        int numRows = sheet.getPhysicalNumberOfRows();
-
-        for (int rowIdx = rowIndex; rowIdx < numRows; rowIdx++) {
-            XSSFRow row = sheet.getRow(rowIdx);
-            if (row == null) {
-                continue;
-            }
-
-            XSSFCell cellG = row.getCell(6); // Assuming column G is the seventh column (0-based index)
-
-            if (cellG != null && cellG.getStringCellValue().contains(targetValue)) {
-                if (rowIdx + 1 < numRows) {
-                    XSSFCell nextCellG = sheet.getRow(rowIdx + 1).getCell(6);
-                    return nextCellG.getStringCellValue();
-                }
-            }
-        }
-
-        return ""; // Return an empty string if no match is found
     }
 }
