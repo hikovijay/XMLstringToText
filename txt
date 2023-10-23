@@ -1,56 +1,19 @@
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-public class TraverseColumnBAndSearch {
-    public static void main(String[] args) {
-        String filePath = "your_excel_file.xlsx"; // Replace with the path to your Excel file
-
-        try (FileInputStream fis = new FileInputStream(filePath);
-             Workbook workbook = new XSSFWorkbook(fis)) {
-            Sheet sheet = workbook.getSheetAt(0); // You can specify the sheet by index or name
-
-            // Iterate through cells in column B starting from row 1
-            for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
+for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
                 Row row = sheet.getRow(rowNum);
-                Cell cellB = row.getCell(1); // Column B is index 1
-                if (cellB != null && cellB.getCellType() == CellType.STRING) {
+                if (row != null) {
+                    // Get the value from column B (assuming it's a String)
+                    Cell cellB = row.getCell(1); // Column B is index 1
                     String valueB = cellB.getStringCellValue();
 
-                    // Search for valueB in the entire column G
-                    for (int searchRow = 1; searchRow <= sheet.getLastRowNum(); searchRow++) {
-                        Row searchRowObj = sheet.getRow(searchRow);
-                        Cell cellG = searchRowObj.getCell(6); // Column G is index 6
-                        if (cellG != null && cellG.getCellType() == CellType.STRING) {
-                            String valueG = cellG.getStringCellValue();
-
-                            if (valueB.equals(valueG) && searchRow < sheet.getLastRowNum()) {
-                                // Get the value from the next line's column cell and update column D
-                                Row nextRow = sheet.getRow(searchRow + 1);
-                                Cell cellGNext = nextRow.getCell(6); // Column G in the next row
-                                if (cellGNext != null && cellGNext.getCellType() == CellType.STRING) {
-                                    String valueD = cellGNext.getStringCellValue();
-
-                                    Cell cellD = row.createCell(3, CellType.STRING); // Column D is index 3
-                                    cellD.setCellValue(valueD);
-                                }
-                            }
+                    // Compare valueB with the string array
+                    for (int i = 0; i < stringArray.length; i++) {
+                        if (valueB.equals(stringArray[i]) && i < stringArray.length - 1) {
+                            // Match found, get the next string from the array and update column D
+                            String valueD = stringArray[i + 1];
+                            Cell cellD = row.createCell(3, CellType.STRING); // Column D is index 3
+                            cellD.setCellValue(valueD);
+                            break; // Exit the loop after a match is found
                         }
                     }
                 }
             }
-
-            // Save the modified workbook
-            try (FileOutputStream fos = new FileOutputStream(filePath)) {
-                workbook.write(fos);
-            }
-
-            System.out.println("Traverse and search completed.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-}
