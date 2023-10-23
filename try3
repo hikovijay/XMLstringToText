@@ -1,17 +1,64 @@
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 
-public class RemoveCharacters {
-    public static String removeChars(String input, String charsToRemove) {
-        String regex = "[" + Pattern.quote(charsToRemove) + "]";
-        return input.replaceAll(regex, "");
+public class ExcelColumnComparison {
+    public static void main(String[] args) {
+        try {
+            FileInputStream file = new FileInputStream("your_excel_file.xlsx");
+            XSSFWorkbook workbook = new XSSFWorkbook(file);
+            XSSFSheet sheet = workbook.getSheetAt(0); // Assuming you are working with the first sheet
+
+            int numRows = sheet.getPhysicalNumberOfRows();
+
+            for (int rowIdx = 0; rowIdx < numRows; rowIdx++) {
+                XSSFRow row = sheet.getRow(rowIdx);
+                if (row == null) {
+                    continue;
+                }
+
+                XSSFCell cellB = row.getCell(1); // Assuming column B is the second column (0-based index)
+                XSSFCell cellD = row.createCell(3, CellType.STRING); // Assuming column D is the fourth column
+
+                if (cellB != null) {
+                    String valueB = cellB.getStringCellValue();
+                    String valueG = findNextValueInColumnG(sheet, valueB, rowIdx);
+                    cellD.setCellValue(valueG);
+                }
+            }
+
+            // Save the modified workbook
+            FileOutputStream outFile = new FileOutputStream("your_modified_excel_file.xlsx");
+            workbook.write(outFile);
+            outFile.close();
+            workbook.close();
+            file.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public static void main(String[] args) {
-        String originalString = "Hello, World!";
-        String charactersToRemove = "loW";
+    private static String findNextValueInColumnG(XSSFSheet sheet, String targetValue, int rowIndex) {
+        int numRows = sheet.getPhysicalNumberOfRows();
 
-        String modifiedString = removeChars(originalString, charactersToRemove);
-        System.out.println(modifiedString); // Output: "He, rd!"
+        for (int rowIdx = rowIndex; rowIdx < numRows; rowIdx++) {
+            XSSFRow row = sheet.getRow(rowIdx);
+            if (row == null) {
+                continue;
+            }
+
+            XSSFCell cellG = row.getCell(6); // Assuming column G is the seventh column (0-based index)
+
+            if (cellG != null && cellG.getStringCellValue().contains(targetValue)) {
+                if (rowIdx + 1 < numRows) {
+                    XSSFCell nextCellG = sheet.getRow(rowIdx + 1).getCell(6);
+                    return nextCellG.getStringCellValue();
+                }
+            }
+        }
+
+        return ""; // Return an empty string if no match is found
     }
 }
