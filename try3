@@ -12,7 +12,9 @@ public class ExcelColumnComparison {
             XSSFWorkbook workbook = new XSSFWorkbook(file);
             Sheet sheet = workbook.getSheetAt(0); // Assuming you are working with the first sheet
 
-            for (Row row : sheet) {
+            for (int rowIndex = 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+                Row row = sheet.getRow(rowIndex);
+
                 Cell cellB = row.getCell(1); // Assuming column B is the second column (0-based index)
                 Cell cellD = row.createCell(3, CellType.STRING); // Assuming column D is the fourth column
 
@@ -20,10 +22,7 @@ public class ExcelColumnComparison {
                     String valueB = cellB.getStringCellValue();
                     String targetValue = valueB;
 
-                    int numRows = sheet.getPhysicalNumberOfRows();
-                    int rowIndex = row.getRowNum();
-
-                    for (int rowIdx = rowIndex; rowIdx < numRows; rowIdx++) {
+                    for (int rowIdx = rowIndex; rowIdx <= sheet.getLastRowNum(); rowIdx++) {
                         Row nextRow = sheet.getRow(rowIdx);
                         if (nextRow == null) {
                             continue;
@@ -34,7 +33,7 @@ public class ExcelColumnComparison {
                         if (cellG != null && cellG.getCellType() == CellType.STRING) {
                             String valueG = cellG.getStringCellValue();
                             if (valueG.contains(targetValue)) {
-                                if (rowIdx + 1 < numRows) {
+                                if (rowIdx + 1 <= sheet.getLastRowNum()) {
                                     Row nextRowG = sheet.getRow(rowIdx + 1);
                                     if (nextRowG != null) {
                                         Cell nextCellG = nextRowG.getCell(6);
