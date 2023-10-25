@@ -32,6 +32,10 @@ public class ExcelColumnComparison {
                     // If either column D contains the value of column C as a substring or vice versa, mark "Pass" in column E.
                     XSSFCell cellE = row.createCell(4); // Column E is the fifth column (index 4).
                     cellE.setCellValue("Pass");
+                } else {
+                    // If there is no match between column C and column D, mark "Fail" in column E.
+                    XSSFCell cellE = row.createCell(4); // Column E is the fifth column (index 4).
+                    cellE.setCellValue("Fail");
                 }
             }
 
