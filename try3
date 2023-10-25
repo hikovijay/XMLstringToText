@@ -1,13 +1,7 @@
-for (int rowIdx = 1; rowIdx <= sheet.getLastRowNum(); rowIdx++) {
-                XSSFRow row = sheet.getRow(rowIdx);
-
-                // Assuming column C is the third column (index 2) and column D is the fourth column (index 3).
-                String columnCValue = getCellValueAsString(row.getCell(2));
-                String columnDValue = getCellValueAsString(row.getCell(3));
-
-                if (columnCValue.contains(columnDValue)) {
-                    // If column D is a substring of column C, mark "Pass" in column E.
-                    XSSFCell cellE = row.createCell(4); // Column E is the fifth column (index 4).
-                    cellE.setCellValue("Pass");
-                }
-            }
+  private static String getCellValueAsString(Cell cell) {
+        if (cell == null) {
+            return "";
+        }
+        cell.setCellType(CellType.STRING); // Ensure the cell is treated as a string.
+        return cell.getStringCellValue();
+    }
