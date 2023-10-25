@@ -1,7 +1,56 @@
-  private static String getCellValueAsString(Cell cell) {
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+public class ExcelColumnComparison {
+    public static void main(String[] args) {
+        try {
+            String excelFilePath = "path_to_your_excel_file.xlsx";
+            FileInputStream fis = new FileInputStream(excelFilePath);
+            XSSFWorkbook workbook = new XSSFWorkbook(fis);
+            XSSFSheet sheet = workbook.getSheetAt(0); // Assuming you want to work with the first sheet.
+
+            for (int rowIdx = 1; rowIdx <= sheet.getLastRowNum(); rowIdx++) {
+                XSSFRow row = sheet.getRow(rowIdx);
+
+                // Assuming column C is the third column (index 2) and column D is the fourth column (index 3).
+                String columnCValue = getCellValueAsString(row.getCell(2));
+                String columnDValue = getCellValueAsString(row.getCell(3));
+
+                // Check if column C is null or empty and stop execution for this row.
+                if (columnCValue == null || columnCValue.isEmpty()) {
+                    break;
+                }
+
+                if (columnDValue.contains(columnCValue)) {
+                    // If column D contains the value of column C, mark "Pass" in column E.
+                    XSSFCell cellE = row.createCell(4); // Column E is the fifth column (index 4).
+                    cellE.setCellValue("Pass");
+                }
+            }
+
+            // Save the changes and close the Excel file.
+            FileOutputStream fos = new FileOutputStream(excelFilePath);
+            workbook.write(fos);
+            fos.close();
+
+            System.out.println("Comparison and update completed. Excel file saved and closed.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static String getCellValueAsString(Cell cell) {
         if (cell == null) {
             return "";
         }
         cell.setCellType(CellType.STRING); // Ensure the cell is treated as a string.
         return cell.getStringCellValue();
     }
+}
