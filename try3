@@ -1,62 +1,24 @@
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+try {
+            String excelFilePath = "path_to_your_excel_file.xlsx";
+            String sheetName = "test_data";
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+            FileInputStream fis = new FileInputStream(excelFilePath);
+            XSSFWorkbook workbook = new XSSFWorkbook(fis);
+            XSSFSheet sheet = workbook.getSheet(sheetName);
 
-public class ExcelColumnComparison {
-    public static void main(String[] args) {
-        try {
-            FileInputStream file = new FileInputStream("your_excel_file.xlsx");
-            XSSFWorkbook workbook = new XSSFWorkbook(file);
-            Sheet sheet = workbook.getSheetAt(0); // Assuming you are working with the first sheet
-
-            for (int rowIndex = 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
-                Row row = sheet.getRow(rowIndex);
-
-                Cell cellB = row.getCell(1); // Assuming column B is the second column (0-based index)
-                Cell cellD = row.createCell(3, CellType.STRING); // Assuming column D is the fourth column
-
-                if (cellB != null && cellB.getCellType() == CellType.STRING) {
-                    String valueB = cellB.getStringCellValue();
-                    String targetValue = valueB;
-
-                    for (int rowIdx = rowIndex; rowIdx <= sheet.getLastRowNum(); rowIdx++) {
-                        Row nextRow = sheet.getRow(rowIdx);
-                        if (nextRow == null) {
-                            continue;
-                        }
-
-                        Cell cellG = nextRow.getCell(6); // Assuming column G is the seventh column (0-based index)
-
-                        if (cellG != null && cellG.getCellType() == CellType.STRING) {
-                            String valueG = cellG.getStringCellValue();
-                            if (valueG.contains(targetValue)) {
-                                if (rowIdx + 1 <= sheet.getLastRowNum()) {
-                                    Row nextRowG = sheet.getRow(rowIdx + 1);
-                                    if (nextRowG != null) {
-                                        Cell nextCellG = nextRowG.getCell(6);
-                                        if (nextCellG != null && nextCellG.getCellType() == CellType.STRING) {
-                                            cellD.setCellValue(nextCellG.getStringCellValue());
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+            if (sheet == null) {
+                // If the sheet doesn't exist, create it.
+                sheet = workbook.createSheet(sheetName);
             }
 
-            // Save the modified workbook
-            FileOutputStream outFile = new FileOutputStream("your_modified_excel_file.xlsx");
-            workbook.write(outFile);
-            outFile.close();
-            workbook.close();
-            file.close();
+            // Do any additional operations on the 'sheet' if needed.
+
+            // Save the changes and close the Excel file.
+            FileOutputStream fos = new FileOutputStream(excelFilePath);
+            workbook.write(fos);
+            fos.close();
+
+            System.out.println("Sheet created or found and Excel file saved and closed.");
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-}
