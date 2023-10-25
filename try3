@@ -1,24 +1,13 @@
-try {
-            String excelFilePath = "path_to_your_excel_file.xlsx";
-            String sheetName = "test_data";
+for (int rowIdx = 1; rowIdx <= sheet.getLastRowNum(); rowIdx++) {
+                XSSFRow row = sheet.getRow(rowIdx);
 
-            FileInputStream fis = new FileInputStream(excelFilePath);
-            XSSFWorkbook workbook = new XSSFWorkbook(fis);
-            XSSFSheet sheet = workbook.getSheet(sheetName);
+                // Assuming column C is the third column (index 2) and column D is the fourth column (index 3).
+                String columnCValue = getCellValueAsString(row.getCell(2));
+                String columnDValue = getCellValueAsString(row.getCell(3));
 
-            if (sheet == null) {
-                // If the sheet doesn't exist, create it.
-                sheet = workbook.createSheet(sheetName);
+                if (columnCValue.contains(columnDValue)) {
+                    // If column D is a substring of column C, mark "Pass" in column E.
+                    XSSFCell cellE = row.createCell(4); // Column E is the fifth column (index 4).
+                    cellE.setCellValue("Pass");
+                }
             }
-
-            // Do any additional operations on the 'sheet' if needed.
-
-            // Save the changes and close the Excel file.
-            FileOutputStream fos = new FileOutputStream(excelFilePath);
-            workbook.write(fos);
-            fos.close();
-
-            System.out.println("Sheet created or found and Excel file saved and closed.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
