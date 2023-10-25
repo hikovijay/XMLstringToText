@@ -28,8 +28,8 @@ public class ExcelColumnComparison {
                     break;
                 }
 
-                if (columnDValue.contains(columnCValue)) {
-                    // If column D contains the value of column C, mark "Pass" in column E.
+                if (columnDValue.contains(columnCValue) || columnCValue.contains(columnDValue)) {
+                    // If either column D contains the value of column C as a substring or vice versa, mark "Pass" in column E.
                     XSSFCell cellE = row.createCell(4); // Column E is the fifth column (index 4).
                     cellE.setCellValue("Pass");
                 }
