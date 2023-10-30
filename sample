@@ -1,12 +1,29 @@
-@DataProvider(name = "excelFiles")
-public Object[] getExcelFiles() {
-    File folder = new File(EXCEL_FOLDER_PATH);
-    File[] files = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".xlsx"));
+public class ExcelSheetTest {
+    // Your existing code...
 
-    String[] excelFileNames = new String[files.length];
-    for (int i = 0; i < files.length; i++) {
-        excelFileNames[i] = files[i].getName();
+    @Test(dataProvider = "excelFiles")
+    public void testExcelFile(String excelFileName) {
+        try {
+            String excelFilePath = EXCEL_FOLDER_PATH + File.separator + excelFileName;
+            String sheetName = "test_data";
+
+            // ...
+
+            // Call the method to create the summary sheet
+            ExcelSummarySheetUtility.createSummarySheet(excelFilePath);
+
+            // Perform your tests on the sheet here.
+
+            // Suppose you have test results in the variables test_name and test_result.
+            // Call the method to write test results to the summary sheet.
+            ExcelSummarySheetUtility.writeTestResult(excelFilePath, test_name, test_result);
+
+            // Save the changes and close the Excel file.
+            // ...
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    return excelFileNames;
+    // ...
 }
