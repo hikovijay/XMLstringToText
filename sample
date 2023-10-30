@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public class UpdateExcelFile {
     public static void main(String[] args) {
-        String result = "Error"; // Initialize the result as "Error"
+        String result = ""; // Initialize the result as an empty string
 
         try {
             String excelFilePath = "your_excel_file.xlsx";
@@ -29,9 +29,14 @@ public class UpdateExcelFile {
                     if (cell != null && cell.getCellType() == CellType.STRING) {
                         String cellValue = cell.getStringCellValue();
                         if ("Fail".equals(cellValue)) {
-                            // Assign a new value "Pass" to the result
+                            // Assign "Fail" if "Fail" is found
+                            result = "Fail";
+                        } else {
+                            // Assign "Pass" if it's not "Fail"
                             result = "Pass";
                         }
+                        // Break the loop since you've found a result
+                        break;
                     }
                 }
             }
