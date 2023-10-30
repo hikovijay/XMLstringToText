@@ -1,29 +1,18 @@
-public class ExcelSummarySheetUtility {
-    private static Map<String, XSSFWorkbook> workbooks = new ConcurrentHashMap<>();
+import java.util.concurrent.TimeUnit;
 
-    public static void createSummarySheet(String excelFilePath) {
-        try {
-            XSSFWorkbook workbook = workbooks.get(excelFilePath);
-            if (workbook == null) {
-                FileInputStream fis = new FileInputStream(excelFilePath);
-                workbook = new XSSFWorkbook(fis);
-                workbooks.put(excelFilePath, workbook);
-            }
+public class PauseExample {
+    public static void main(String[] args) {
+        // Pause for 3 seconds
+        pauseSeconds(3);
 
-            String summarySheetName = "Summary";
-            XSSFSheet summarySheet = workbook.getSheet(summarySheetName);
-            if (summarySheet == null) {
-                // If the summary sheet doesn't exist, create it.
-                summarySheet = workbook.createSheet(summarySheetName);
-                // Add a header row for the summary sheet.
-                XSSFRow headerRow = summarySheet.createRow(0);
-                headerRow.createCell(0).setCellValue("Test Name");
-                headerRow.createCell(1).setCellValue("Test Result");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // Continue with the rest of your code
     }
 
-    // ...
+    public static void pauseSeconds(int seconds) {
+        try {
+            TimeUnit.SECONDS.sleep(seconds);
+        } catch (InterruptedException e) {
+            // Handle the interruption if needed
+        }
+    }
 }
