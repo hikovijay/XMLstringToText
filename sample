@@ -1,29 +1,11 @@
+import org.testng.annotations.AfterSuite;
+
 public class ExcelSheetTest {
     // Your existing code...
 
-    @Test(dataProvider = "excelFiles")
-    public void testExcelFile(String excelFileName) {
-        try {
-            String excelFilePath = EXCEL_FOLDER_PATH + File.separator + excelFileName;
-            String sheetName = "test_data";
-
-            // ...
-
-            // Call the method to create the summary sheet
-            ExcelSummarySheetUtility.createSummarySheet(excelFilePath);
-
-            // Perform your tests on the sheet here.
-
-            // Suppose you have test results in the variables test_name and test_result.
-            // Call the method to write test results to the summary sheet.
-            ExcelSummarySheetUtility.writeTestResult(excelFilePath, test_name, test_result);
-
-            // Save the changes and close the Excel file.
-            // ...
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    @AfterSuite
+    public void afterSuite() {
+        // Close all workbooks to save changes.
+        ExcelSummarySheetUtility.closeWorkbooks();
     }
-
-    // ...
 }
