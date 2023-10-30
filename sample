@@ -1,84 +1,30 @@
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.AfterTest;
+public class ExcelSummarySheetUtility {
+    // ... (other methods)
 
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-public class ExcelSheetTest {
-    private static final String EXCEL_FOLDER_PATH = "path_to_folder_with_excel_files";
-
-    @BeforeTest
-    public void setUp() {
-        // Any setup code you need before running the tests.
-    }
-
-    @Test(dataProvider = "excelFiles")
-    public void testExcelFile(String excelFileName) {
+    public static void writeTestResult(String excelFilePath, String test_name, String test_result) {
         try {
-            String excelFilePath = EXCEL_FOLDER_PATH + File.separator + excelFileName;
-            String sheetName = "test_data";
-
-            FileInputStream fis = new FileInputStream(excelFilePath);
-            XSSFWorkbook workbook = new XSSFWorkbook(fis);
-            XSSFSheet sheet = workbook.getSheet(sheetName);
-
-            if (sheet == null) {
-                // If the sheet doesn't exist, create it.
-                sheet = workbook.createSheet(sheetName);
+            XSSFWorkbook workbook = workbooks.get(excelFilePath);
+            if (workbook == null) {
+                System.out.println("Workbook not found for file: " + excelFilePath);
+                return;
             }
 
-            // Perform your tests on the sheet here.
+            XSSFSheet summarySheet = workbook.getSheet("Summary");
 
-            // Add code to write test results to the summary sheet
-            String summarySheetName = "Summary";
-            XSSFSheet summarySheet = workbook.getSheet(summarySheetName);
-            if (summarySheet == null) {
-                // If the summary sheet doesn't exist, create it.
-                summarySheet = workbook.createSheet(summarySheetName);
-                // Add a header row for the summary sheet.
-                XSSFRow headerRow = summarySheet.createRow(0);
-                headerRow.createCell(0).setCellValue("Test Name");
-                headerRow.createCell(1).setCellValue("Test Result");
+            // Clear existing rows in the summary sheet
+            while (summarySheet.getLastRowNum() >= 1) { // Leave the header row
+                summarySheet.removeRow(summarySheet.getRow(1));
             }
-            // Suppose you have test results in the variables test_name and test_result.
-            // Add code here to write test results to the summary sheet.
+
+            // Add code to write test results to the summary sheet.
             int lastRow = summarySheet.getLastRowNum();
             XSSFRow newRow = summarySheet.createRow(lastRow + 1);
             newRow.createCell(0).setCellValue(test_name);
             newRow.createCell(1).setCellValue(test_result);
-
-            // Save the changes and close the Excel file.
-            FileOutputStream fos = new FileOutputStream(excelFilePath);
-            workbook.write(fos);
-            fos.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    @DataProvider(name = "excelFiles")
-    public Object[] getExcelFiles() {
-        File folder = new File(EXCEL_FOLDER_PATH);
-        File[] files = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".xlsx"));
-
-        String[] excelFileNames = new String[files.length];
-        for (int i = 0; i < files.length; i++) {
-            excelFileNames[i] = files[i].getName();
-        }
-
-        return excelFileNames;
-    }
-
-    @AfterTest
-    public void tearDown() {
-        // Any cleanup code you need after running the tests.
-    }
+    // ... (other methods)
 }
