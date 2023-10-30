@@ -36,7 +36,25 @@ public class ExcelSheetTest {
             }
 
             // Perform your tests on the sheet here.
-            
+
+            // Add code to write test results to the summary sheet
+            String summarySheetName = "Summary";
+            XSSFSheet summarySheet = workbook.getSheet(summarySheetName);
+            if (summarySheet == null) {
+                // If the summary sheet doesn't exist, create it.
+                summarySheet = workbook.createSheet(summarySheetName);
+                // Add a header row for the summary sheet.
+                XSSFRow headerRow = summarySheet.createRow(0);
+                headerRow.createCell(0).setCellValue("Test Name");
+                headerRow.createCell(1).setCellValue("Test Result");
+            }
+            // Suppose you have test results in the variables test_name and test_result.
+            // Add code here to write test results to the summary sheet.
+            int lastRow = summarySheet.getLastRowNum();
+            XSSFRow newRow = summarySheet.createRow(lastRow + 1);
+            newRow.createCell(0).setCellValue(test_name);
+            newRow.createCell(1).setCellValue(test_result);
+
             // Save the changes and close the Excel file.
             FileOutputStream fos = new FileOutputStream(excelFilePath);
             workbook.write(fos);
