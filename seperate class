@@ -1,0 +1,57 @@
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+public class ExcelSummarySheetUtility {
+    public static void createSummarySheet(String excelFilePath) {
+        try {
+            FileInputStream fis = new FileInputStream(excelFilePath);
+            XSSFWorkbook workbook = new XSSFWorkbook(fis);
+
+            String summarySheetName = "Summary";
+            XSSFSheet summarySheet = workbook.getSheet(summarySheetName);
+            if (summarySheet == null) {
+                // If the summary sheet doesn't exist, create it.
+                summarySheet = workbook.createSheet(summarySheetName);
+                // Add a header row for the summary sheet.
+                XSSFRow headerRow = summarySheet.createRow(0);
+                headerRow.createCell(0).setCellValue("Test Name");
+                headerRow.createCell(1).setCellValue("Test Result");
+            }
+
+            // Save the changes and close the Excel file.
+            FileOutputStream fos = new FileOutputStream(excelFilePath);
+            workbook.write(fos);
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void writeTestResult(String excelFilePath, String test_name, String test_result) {
+        try {
+            FileInputStream fis = new FileInputStream(excelFilePath);
+            XSSFWorkbook workbook = new XSSFWorkbook(fis);
+            XSSFSheet summarySheet = workbook.getSheet("Summary");
+
+            // Add code to write test results to the summary sheet.
+            int lastRow = summarySheet.getLastRowNum();
+            XSSFRow newRow = summarySheet.createRow(lastRow + 1);
+            newRow.createCell(0).setCellValue(test_name);
+            newRow.createCell(1).setCellValue(test_result);
+
+            // Save the changes and close the Excel file.
+            FileOutputStream fos = new FileOutputStream(excelFilePath);
+            workbook.write(fos);
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
