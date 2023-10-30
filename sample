@@ -1,57 +1,12 @@
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-public class UpdateExcelFile {
-    public static void main(String[] args) {
-        String result = ""; // Initialize the result as an empty string
-
-        try {
-            String excelFilePath = "your_excel_file.xlsx";
-            FileInputStream fis = new FileInputStream(excelFilePath);
-            XSSFWorkbook workbook = new XSSFWorkbook(fis);
-
-            // Specify the sheet you want to work with (0-based index)
-            XSSFSheet sheet = workbook.getSheetAt(0);
-
-            // Get the index of the E column (assuming it's column E or index 4)
-            int columnIndex = 4;
-
-            // Iterate through all rows in the sheet, starting from the second row (index 1)
-            for (int rowIndex = 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
-                Row row = sheet.getRow(rowIndex);
-                if (row != null) {
-                    // Get the cell in the E column
-                    Cell cell = row.getCell(columnIndex);
-                    if (cell != null && cell.getCellType() == CellType.STRING) {
-                        String cellValue = cell.getStringCellValue();
-                        if ("Fail".equals(cellValue)) {
-                            // Assign "Fail" if "Fail" is found
-                            result = "Fail";
-                        } else {
-                            // Assign "Pass" if it's not "Fail"
-                            result = "Pass";
-                        }
-                        // Break the loop since you've found a result
-                        break;
-                    }
-                }
-            }
-
-            // Save the changes
-            FileOutputStream fos = new FileOutputStream(excelFilePath);
-            workbook.write(fos);
-            fos.close();
-
-            System.out.println("Excel file updated successfully.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // Use the 'result' variable outside the loops
-        System.out.println("Result: " + result);
-    }
-}
+<suite name="MyTestSuite" parallel="tests" thread-count="2">
+    <test name="Test 1">
+        <classes>
+            <class name="com.example.TestClass1" />
+        </classes>
+    </test>
+    <test name="Test 2">
+        <classes>
+            <class name="com.example.TestClass2" />
+        </classes>
+    </test>
+</suite>
