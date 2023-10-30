@@ -6,16 +6,13 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
 public class ExcelDataProviderTest {
 
-    @DataProvider(name = "excelData")
-    public Object[][] getExcelData() {
+    @DataProvider(name = "excelFileNames")
+    public Object[][] getExcelFileNames() {
         String folderPath = "path_to_your_excel_files_folder";
         List<Object[]> data = new ArrayList<>();
-        
+
         File folder = new File(folderPath);
         File[] files = folder.listFiles(new FilenameFilter() {
             @Override
@@ -25,7 +22,7 @@ public class ExcelDataProviderTest {
         });
 
         for (File file : files) {
-            data.add(new Object[] { file.getAbsolutePath() });
+            data.add(new Object[] { file.getName() }); // Get the file name
         }
 
         Object[][] dataArray = new Object[data.size()][1];
@@ -36,24 +33,9 @@ public class ExcelDataProviderTest {
         return dataArray;
     }
 
-    @Test(dataProvider = "excelData")
-    public void testWithExcelData(String excelFilePath) {
-        try {
-            FileInputStream fileInputStream = new FileInputStream(excelFilePath);
-            Workbook workbook = new XSSFWorkbook(fileInputStream);
-            Sheet sheet = workbook.getSheetAt(0); // Assuming you want data from the first sheet
-
-            for (Row row : sheet) {
-                for (Cell cell : row) {
-                    System.out.print(cell.toString() + "\t");
-                }
-                System.out.println();
-            }
-
-            workbook.close();
-            fileInputStream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    @Test(dataProvider = "excelFileNames")
+    public void testWithExcelFileNames(String excelFileName) {
+        System.out.println("Excel file name: " + excelFileName);
+        // You can open and process the Excel file with its name here.
     }
 }
