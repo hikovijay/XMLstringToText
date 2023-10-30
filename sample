@@ -1,14 +1,12 @@
-public static void closeWorkbooks() {
-    for (Map.Entry<String, XSSFWorkbook> entry : workbooks.entrySet()) {
-        try {
-            String excelFilePath = entry.getKey();
-            XSSFWorkbook workbook = entry.getValue();
-            
-            FileOutputStream fos = new FileOutputStream(excelFilePath);
-            workbook.write(fos);
-            fos.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+@DataProvider(name = "excelFiles")
+public Object[] getExcelFiles() {
+    File folder = new File(EXCEL_FOLDER_PATH);
+    File[] files = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".xlsx"));
+
+    String[] excelFileNames = new String[files.length];
+    for (int i = 0; i < files.length; i++) {
+        excelFileNames[i] = files[i].getName();
     }
+
+    return excelFileNames;
 }
