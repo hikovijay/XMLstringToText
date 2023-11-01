@@ -1,4 +1,5 @@
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.xmlbeans.POIXMLProperties;
 
 @DataProvider(name = "excelFiles")
 public Object[] getExcelFiles() {
@@ -14,8 +15,10 @@ public Object[] getExcelFiles() {
         try (FileInputStream fis = new FileInputStream(file);
              XSSFWorkbook workbook = new XSSFWorkbook(fis)) {
 
-            // Check if the workbook name is "Summary"
-            if (!workbook.getProperties().getExtendedProperties().getApplication().equals("Summary")) {
+            POIXMLProperties.ExtendedProperties properties = workbook.getProperties().getExtendedProperties();
+
+            // Check if the workbook name is "Summary.xlsx"
+            if (!properties.getApplication().equals("Summary.xlsx")) {
                 ExcelFile excelFile = new ExcelFile(file.getName());
                 excelFileObjects.add(excelFile);
             }
@@ -26,17 +29,4 @@ public Object[] getExcelFiles() {
     }
 
     return excelFileObjects.toArray();
-}
-
-// Define a simple class to encapsulate the file name
-class ExcelFile {
-    private String fileName;
-
-    public ExcelFile(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
 }
