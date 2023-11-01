@@ -1,36 +1,46 @@
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class ExcelFileHandler {
+public class ExcelSheetHandler {
     public static void main(String[] args) {
         String filePath = "path/to/existing_or_new/excel/file.xlsx";
+        String sheetName = "MySheet"; // Name of the sheet you want to check or create
         
-        // Call the method to search for or create the Excel file
+        // Call the method to check for or create the sheet
         try {
-            createOrOpenExcelFile(filePath);
+            checkOrCreateSheet(filePath, sheetName);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void createOrOpenExcelFile(String filePath) throws IOException {
-        File file = new File(filePath);
+    public static void checkOrCreateSheet(String filePath, String sheetName) throws IOException {
+        FileInputStream fis = new FileInputStream(filePath);
+        XSSFWorkbook workbook = new XSSFWorkbook(fis);
 
-        if (file.exists()) {
-            System.out.println("Excel file exists: " + filePath);
-        } else {
-            System.out.println("Excel file does not exist. Creating a new one...");
+        // Check if the sheet exists
+        XSSFSheet sheet = workbook.getSheet(sheetName);
 
-            // Create a new Excel file
-            XSSFWorkbook workbook = new XSSFWorkbook();
+        if (sheet == null) {
+            // If the sheet doesn't exist, create a new one
+            sheet = workbook.createSheet(sheetName);
+
+            // Optionally, you can perform operations on the new sheet here
+
+            // Save the changes back to the Excel file
             FileOutputStream fos = new FileOutputStream(filePath);
             workbook.write(fos);
             fos.close();
 
-            System.out.println("New Excel file created: " + filePath);
+            System.out.println("Sheet '" + sheetName + "' created.");
+        } else {
+            System.out.println("Sheet '" + sheetName + "' already exists.");
         }
+
+        fis.close();
     }
 }
