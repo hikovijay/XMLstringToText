@@ -1,41 +1,62 @@
+import org.testng.*;
+import org.testng.annotations.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class UpdateExistingExcel {
-    public static void main(String[] args) {
-        // Specify the path to the existing Excel file
-        String filePath = "path/to/your/existing/file.xlsx";
+public class TestClass {
+    private static XSSFWorkbook workbook;
+    private static XSSFSheet sheet;
+    private static int rowIndex = 1;
 
-        try (FileInputStream fis = new FileInputStream(filePath);
-             XSSFWorkbook workbook = new XSSFWorkbook(fis)) {
+    @BeforeSuite
+    public void setUp() {
+        workbook = new XSSFWorkbook();
+        sheet = workbook.createSheet("TestResults");
+        rowIndex = 1;
+    }
 
-            // Get the sheet you want to modify (e.g., the first sheet at index 0)
-            XSSFSheet sheet = workbook.getSheetAt(0);
-
-            // Create a new row
-            int rowIndex = sheet.getLastRowNum() + 1;
-            Row row = sheet.createRow(rowIndex);
-
-            // Create cells and set values in the row
-            Cell cell1 = row.createCell(0);
-            cell1.setCellValue("New Value1");
-
-            Cell cell2 = row.createCell(1);
-            cell2.setCellValue("New Value2");
-
-            // Save the changes to the existing Excel file
-            try (FileOutputStream fos = new FileOutputStream(filePath)) {
-                workbook.write(fos);
-            }
-
-            System.out.println("Data updated in the existing Excel file.");
-
+    @AfterSuite
+    public void tearDown() {
+        try (FileOutputStream fos = new FileOutputStream("ConsolidatedTestResults.xlsx")) {
+            workbook.write(fos);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void testMethod1() {
+        String value1 = "Value1";
+        String value2 = "Value2";
+        String value3 = "Value3";
+        String value4 = "Value4";
+        String value5 = "Value5";
+        recordResult("Test Method 1", value1, value2, value3, value4, value5);
+    }
+
+    @Test
+    public void testMethod2() {
+        String value1 = "AnotherValue1";
+        String value2 = "AnotherValue2";
+        String value3 = "AnotherValue3";
+        String value4 = "AnotherValue4";
+        String value5 = "AnotherValue5";
+        recordResult("Test Method 2", value1, value2, value3, value4, value5);
+    }
+
+    // Add more test methods as needed
+
+    private void recordResult(String testName, String value1, String value2, String value3, String value4, String value5) {
+        Row row = sheet.createRow(rowIndex++);
+        row.createCell(0).setCellValue(testName);
+        row.createCell(1).setCellValue(value1);
+        row.createCell(2).setCellValue(value2);
+        row.createCell(3).setCellValue(value3);
+        row.createCell(4).setCellValue(value4);
+        row.createCell(5).setCellValue(value5);
     }
 }
