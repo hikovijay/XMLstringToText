@@ -1,5 +1,5 @@
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -21,8 +21,14 @@ public class PasteLargeStringWithSelenium {
         // Replace "your_large_string" with your actual large string
         String largeString = "your_large_string";
 
-        // Use JavaScript to set the input field's value to the large string
-        ((JavascriptExecutor) driver).executeScript("arguments[0].value = arguments[1];", inputField, largeString);
+        // Split the string into smaller chunks (e.g., 100 characters) and send them sequentially
+        int chunkSize = 100;
+        for (int i = 0; i < largeString.length(); i += chunkSize) {
+            int end = Math.min(i + chunkSize, largeString.length());
+            String chunk = largeString.substring(i, end);
+            inputField.sendKeys(chunk);
+            inputField.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE); // Clear the field before sending the next chunk
+        }
 
         // Optionally, submit the form or perform other actions on the webpage
         // inputField.submit();
