@@ -1,12 +1,42 @@
-HttpURLConnection connection = (HttpURLConnection) new URL("https://example.com/your_page").openConnection();
-int statusCode = connection.getResponseCode();
-if (statusCode == 404) {
-    // Handle the "Page Not Found" error
-}
+import org.apache.commons.io.FileUtils;
+import java.io.File;
+import java.io.IOException;
 
+public class DeleteExcelFilesInFolder {
+    public static void main(String[] args) {
+        // Define the path to the folder where you want to search for and delete Excel files
+        String folderPath = "your_folder_path_here";
 
-try {
-    driver.get("https://example.com/your_page");
-} catch (org.openqa.selenium.TimeoutException e) {
-    // Handle the timeout error (e.g., log the error, take a screenshot, or perform another action)
+        // Define the file extension to search for (e.g., .xlsx)
+        String fileExtension = ".xlsx";
+
+        // Create a File object for the folder
+        File folder = new File(folderPath);
+
+        // Check if the folder exists and is a directory
+        if (folder.exists() && folder.isDirectory()) {
+            // List all files in the folder
+            File[] files = folder.listFiles();
+
+            if (files != null) {
+                for (File file : files) {
+                    // Check if the file is an Excel file with the specified extension
+                    if (file.isFile() && file.getName().toLowerCase().endsWith(fileExtension)) {
+                        // Delete the Excel file
+                        try {
+                            FileUtils.forceDelete(file);
+                            System.out.println("Deleted Excel file: " + file.getName());
+                        } catch (IOException e) {
+                            System.err.println("Failed to delete Excel file: " + file.getName());
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            } else {
+                System.out.println("No files found in the folder.");
+            }
+        } else {
+            System.err.println("The specified folder does not exist or is not a directory.");
+        }
+    }
 }
