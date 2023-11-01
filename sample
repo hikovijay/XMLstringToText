@@ -15,15 +15,19 @@ public class TestClass {
     @Test
     public void testMethod1() {
         // Your test code here
-        String testValue1 = "This is the value for testMethod1.";
-        CustomExcelResultListener.setTestValue(testValue1);
+        String value1 = "Value1";
+        String value2 = "Value2";
+        String value3 = "Value3";
+        CustomExcelResultListener.setTestValues(value1, value2, value3);
     }
 
     @Test
     public void testMethod2() {
         // Your test code here
-        String testValue2 = "This is the value for testMethod2.";
-        CustomExcelResultListener.setTestValue(testValue2);
+        String value1 = "AnotherValue1";
+        String value2 = "AnotherValue2";
+        String value3 = "AnotherValue3";
+        CustomExcelResultListener.setTestValues(value1, value2, value3);
     }
 
     // Add more test methods as needed
@@ -32,10 +36,14 @@ public class TestClass {
 class CustomExcelResultListener implements ITestListener, ISuiteListener {
     private List<XSSFWorkbook> workbooks = new ArrayList<>();
     private int testIndex = 0;
-    private static ThreadLocal<String> testValueThreadLocal = ThreadLocal.withInitial(() -> "");
+    private static ThreadLocal<String[]> testValuesThreadLocal = ThreadLocal.withInitial(() -> new String[3]);
 
-    public static void setTestValue(String value) {
-        testValueThreadLocal.set(value);
+    public static void setTestValues(String value1, String value2, String value3) {
+        String[] values = new String[3];
+        values[0] = value1;
+        values[1] = value2;
+        values[2] = value3;
+        testValuesThreadLocal.set(values);
     }
 
     @Override
@@ -92,8 +100,8 @@ class CustomExcelResultListener implements ITestListener, ISuiteListener {
         Row row = sheet.createRow(0);
         Cell cell = row.createCell(0);
 
-        String testValue = testValueThreadLocal.get();
-        testValueThreadLocal.remove();
+        String[] testValues = testValuesThreadLocal.get();
+        testValuesThreadLocal.remove();
 
         if (result.getStatus() == ITestResult.SUCCESS) {
             cell.setCellValue("PASS");
@@ -103,8 +111,10 @@ class CustomExcelResultListener implements ITestListener, ISuiteListener {
             cell.setCellValue("SKIP");
         }
 
-        // Record the test value in a separate cell
-        row.createCell(1).setCellValue(testValue);
+        // Record the test values in separate cells
+        for (int i = 0; i < 3; i++) {
+            row.createCell(i + 1).setCellValue(testValues[i]);
+        }
     }
 
     // Implement other methods from ITestListener if needed
