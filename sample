@@ -1,6 +1,5 @@
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.parser.microsoft.ooxml.OOXMLParser;
 
 @DataProvider(name = "excelFiles")
 public Object[] getExcelFiles() {
@@ -13,36 +12,18 @@ public Object[] getExcelFiles() {
 
     List<Object> excelFileObjects = new ArrayList<>();
     for (File file : files) {
-        try (FileInputStream fis = new FileInputStream(file);
-             XSSFWorkbook workbook = new XSSFWorkbook(fis)) {
+        try (FileInputStream fis = new FileInputStream(file)) {
+            XSSFWorkbook workbook = (XSSFWorkbook) WorkbookFactory.create(fis);
 
-            String internalName = getInternalName(file);
-
-            // Check if the internal workbook name is "Summary.xlsx"
-            if (!internalName.equals("Summary.xlsx")) {
+            // Check if the workbook name is "Summary.xlsx"
+            if (!workbook.getProperties().getExtendedProperties().getApplication().equals("Summary.xlsx")) {
                 ExcelFile excelFile = new ExcelFile(file.getName());
                 excelFileObjects.add(excelFile);
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     return excelFileObjects.toArray();
-}
-
-// Helper method to extract internal workbook name
-private String getInternalName(File file) {
-    try {
-        FileInputStream fis = new FileInputStream(file);
-        Metadata metadata = new Metadata();
-        new OOXMLParser().parse(fis, null, metadata);
-
-        // Retrieve the internal workbook name from the metadata
-        return metadata.get("Application-Name");
-    } catch (Exception e) {
-        e.printStackTrace();
-        return "";
-    }
 }
