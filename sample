@@ -38,8 +38,10 @@ public class TestClass {
 }
 
 class CustomExcelResultListener implements ITestListener, ISuiteListener {
-    private List<XSSFWorkbook> workbooks = new ArrayList<>();
-    private int testIndex = 0;
+    private static XSSFWorkbook workbook;
+    private static XSSFSheet sheet;
+    private static int rowIndex = 1; // Start from the second row (0-based index)
+
     private static ThreadLocal<String[]> testValuesThreadLocal = ThreadLocal.withInitial(() -> new String[5]);
 
     public static void setTestValues(String value1, String value2, String value3, String value4, String value5) {
@@ -54,27 +56,25 @@ class CustomExcelResultListener implements ITestListener, ISuiteListener {
 
     @Override
     public void onStart(ISuite suite) {
-        // No action needed here
+        // Create a new workbook and a single sheet for all test results
+        workbook = new XSSFWorkbook();
+        sheet = workbook.createSheet("TestResults");
+        rowIndex = 1;
     }
 
     @Override
     public void onFinish(ISuite suite) {
-        // Close all workbooks after all tests have executed
-        for (XSSFWorkbook workbook : workbooks) {
-            try (FileOutputStream fos = new FileOutputStream("TestResult_" + testIndex + ".xlsx")) {
-                workbook.write(fos);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            testIndex++;
+        // Close the workbook after all tests have executed
+        try (FileOutputStream fos = new FileOutputStream("TestResults.xlsx")) {
+            workbook.write(fos);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     @Override
     public void onTestStart(ITestResult result) {
-        // Create a new workbook for each test
-        XSSFWorkbook workbook = new XSSFWorkbook();
-        workbooks.add(workbook);
+        // No action needed here
     }
 
     @Override
@@ -98,30 +98,25 @@ class CustomExcelResultListener implements ITestListener, ISuiteListener {
     }
 
     private void recordResult(ITestResult result) {
-        int lastWorkbookIndex = workbooks.size() - 1;
-        XSSFWorkbook workbook = workbooks.get(lastWorkbookIndex);
-        XSSFSheet sheet = workbook.createSheet(result.getName());
-
-        // Record the result in the sheet
-        Row row = sheet.createRow(0);
-        Cell cell = row.createCell(0);
-
         String[] testValues = testValuesThreadLocal.get();
         testValuesThreadLocal.remove();
 
-        if (result.getStatus() == ITestResult.SUCCESS) {
-            cell.setCellValue("PASS");
-        } else if (result.getStatus() == ITestResult.FAILURE) {
-            cell.setCellValue("FAIL");
-        } else {
-            cell.setCellValue("SKIP");
-        }
+        Row row = sheet.createRow(rowIndex++);
+        row.createCell(0).setCellValue(result.getName());
 
-        // Record the test values in separate cells
         for (int i = 0; i < 5; i++) {
             row.createCell(i + 1).setCellValue(testValues[i]);
+        }
+
+        if (result.getStatus() == ITestResult.SUCCESS) {
+            row.createCell(6).setCellValue("PASS");
+        } else if (result.getStatus() == ITestResult.FAILURE) {
+            row.createCell(6).setCellValue("FAIL");
+        } else {
+            row.createCell(6).setCellValue("SKIP");
         }
     }
 
     // Implement other methods from ITestListener if needed
 }
+
