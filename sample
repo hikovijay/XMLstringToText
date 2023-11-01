@@ -1,38 +1,33 @@
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+JavascriptExecutor js = (JavascriptExecutor) driver;
+js.executeScript("document.getElementById('yourTextAreaId').value = 'Your text';");
+js.executeScript("document.getElementById('yourTextAreaId').dispatchEvent(new Event('change'));");
 
-@DataProvider(name = "excelFiles")
-public Object[] getExcelFiles() {
-    File folder = new File(EXCEL_FOLDER_PATH);
-    File[] files = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".xlsx"));
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 
-    if (files == null) {
-        return new Object[0]; // Return an empty array if no files are found.
+public class LargeStringInput {
+    public static void main(String[] args) {
+        // Set the path to the ChromeDriver executable
+        System.setProperty("webdriver.chrome.driver", "path/to/chromedriver.exe");
+
+        // Initialize the WebDriver
+        WebDriver driver = new ChromeDriver();
+
+        // Navigate to a webpage with a textarea element
+        driver.get("https://example.com/some_page");
+
+        // Large string to input
+        String largeString = "This is a very large string..."; // Replace with your large string
+
+        // Use JavaScript Executor to set the value of a textarea
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("document.getElementById('yourTextAreaId').value = arguments[0];", largeString);
+
+        // Optionally, submit the form or take further actions
+        // js.executeScript("document.getElementById('yourFormId').submit();");
+
+        // Close the WebDriver
+        driver.quit();
     }
-
-    List<Object> excelFileObjects = new ArrayList<>();
-    for (File file : files) {
-        try (FileInputStream fis = new FileInputStream(file)) {
-            XSSFWorkbook workbook = (XSSFWorkbook) WorkbookFactory.create(fis);
-
-            // Check if the workbook name is "Summary.xlsx"
-            if (!workbook.getProperties().getExtendedProperties().getApplication().equals("Summary.xlsx")) {
-                ExcelFile excelFile = new ExcelFile(file.getName());
-                excelFileObjects.add(excelFile);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    // Iterate over the list and remove the filename "Summary.xlsx"
-    Iterator<Object> iterator = excelFileObjects.iterator();
-    while (iterator.hasNext()) {
-        ExcelFile excelFile = (ExcelFile) iterator.next();
-        if (excelFile.getFileName().equals("Summary.xlsx")) {
-            iterator.remove();
-        }
-    }
-
-    return excelFileObjects.toArray();
 }
