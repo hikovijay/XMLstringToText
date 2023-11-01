@@ -1,42 +1,8 @@
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-public class AutoIndentColumns {
-    public static void main(String[] args) {
-        // Create a new Excel workbook
-        Workbook workbook = new XSSFWorkbook();
-
-        // Create a new sheet
-        Sheet sheet = workbook.createSheet("AutoIndentExample");
-
-        // Create a cell style with right alignment (indented appearance)
-        CellStyle indentedStyle = workbook.createCellStyle();
-        indentedStyle.setAlignment(HorizontalAlignment.RIGHT);
-
-        // Create rows and cells with the indented style
-        for (int rowIdx = 0; rowIdx < 5; rowIdx++) {
-            Row row = sheet.createRow(rowIdx);
-
-            for (int colIdx = 0; colIdx < 5; colIdx++) {
-                Cell cell = row.createCell(colIdx);
-                cell.setCellValue("Indented Text");
-                cell.setCellStyle(indentedStyle);
-            }
-        }
-
-        // Auto-size columns for a cleaner appearance (optional)
-        for (int colIdx = 0; colIdx < 5; colIdx++) {
-            sheet.autoSizeColumn(colIdx);
-        }
-
-        try (FileOutputStream fos = new FileOutputStream("AutoIndentColumns.xlsx")) {
-            workbook.write(fos);
-            System.out.println("Excel file created with auto-indent effect.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-}
+<suite name="YourTestSuite" parallel="tests" thread-count="2">
+    <test name="Test1">
+        <classes>
+            <class name="your.package.ParallelTestExample"/>
+        </classes>
+    </test>
+    <!-- Add more <test> elements for additional tests if needed -->
+</suite>
