@@ -1,39 +1,42 @@
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-public class PasteLargeStringWithSelenium {
-    public static void main(String[] args) {
-        // Set the path to the ChromeDriver executable
-        System.setProperty("webdriver.chrome.driver", "path/to/chromedriver.exe");
+@DataProvider(name = "excelFiles")
+public Object[] getExcelFiles() {
+    File folder = new File(EXCEL_FOLDER_PATH);
+    File[] files = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".xlsx"));
 
-        // Initialize the WebDriver
-        WebDriver driver = new ChromeDriver();
+    if (files == null) {
+        return new Object[0]; // Return an empty array if no files are found.
+    }
 
-        // Navigate to the webpage where you want to paste the large string
-        driver.get("https://example.com");
+    List<Object> excelFileObjects = new ArrayList<>();
+    for (File file : files) {
+        try (FileInputStream fis = new FileInputStream(file);
+             XSSFWorkbook workbook = new XSSFWorkbook(fis)) {
 
-        // Locate the input field or text area where you want to paste the string
-        WebElement inputField = driver.findElement(By.id("your_input_element_id"));
+            // Check if the workbook name is "Summary"
+            if (!workbook.getProperties().getExtendedProperties().getApplication().equals("Summary")) {
+                ExcelFile excelFile = new ExcelFile(file.getName());
+                excelFileObjects.add(excelFile);
+            }
 
-        // Replace "your_large_string" with your actual large string
-        String largeString = "your_large_string";
-
-        // Split the string into smaller chunks (e.g., 100 characters) and send them sequentially
-        int chunkSize = 100;
-        for (int i = 0; i < largeString.length(); i += chunkSize) {
-            int end = Math.min(i + chunkSize, largeString.length());
-            String chunk = largeString.substring(i, end);
-            inputField.sendKeys(chunk);
-            inputField.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE); // Clear the field before sending the next chunk
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
 
-        // Optionally, submit the form or perform other actions on the webpage
-        // inputField.submit();
+    return excelFileObjects.toArray();
+}
 
-        // Close the WebDriver
-        driver.quit();
+// Define a simple class to encapsulate the file name
+class ExcelFile {
+    private String fileName;
+
+    public ExcelFile(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getFileName() {
+        return fileName;
     }
 }
