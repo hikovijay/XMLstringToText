@@ -18,7 +18,9 @@ public class TestClass {
         String value1 = "Value1";
         String value2 = "Value2";
         String value3 = "Value3";
-        CustomExcelResultListener.setTestValues(value1, value2, value3);
+        String value4 = "Value4";
+        String value5 = "Value5";
+        CustomExcelResultListener.setTestValues(value1, value2, value3, value4, value5);
     }
 
     @Test
@@ -27,7 +29,9 @@ public class TestClass {
         String value1 = "AnotherValue1";
         String value2 = "AnotherValue2";
         String value3 = "AnotherValue3";
-        CustomExcelResultListener.setTestValues(value1, value2, value3);
+        String value4 = "AnotherValue4";
+        String value5 = "AnotherValue5";
+        CustomExcelResultListener.setTestValues(value1, value2, value3, value4, value5);
     }
 
     // Add more test methods as needed
@@ -36,13 +40,15 @@ public class TestClass {
 class CustomExcelResultListener implements ITestListener, ISuiteListener {
     private List<XSSFWorkbook> workbooks = new ArrayList<>();
     private int testIndex = 0;
-    private static ThreadLocal<String[]> testValuesThreadLocal = ThreadLocal.withInitial(() -> new String[3]);
+    private static ThreadLocal<String[]> testValuesThreadLocal = ThreadLocal.withInitial(() -> new String[5]);
 
-    public static void setTestValues(String value1, String value2, String value3) {
-        String[] values = new String[3];
+    public static void setTestValues(String value1, String value2, String value3, String value4, String value5) {
+        String[] values = new String[5];
         values[0] = value1;
         values[1] = value2;
         values[2] = value3;
+        values[3] = value4;
+        values[4] = value5;
         testValuesThreadLocal.set(values);
     }
 
@@ -112,7 +118,7 @@ class CustomExcelResultListener implements ITestListener, ISuiteListener {
         }
 
         // Record the test values in separate cells
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 5; i++) {
             row.createCell(i + 1).setCellValue(testValues[i]);
         }
     }
