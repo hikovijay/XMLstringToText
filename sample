@@ -1,9 +1,6 @@
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.poi.poifs.filesystem.POIXMLProperties;
-import org.apache.poi.xwpf.usermodel.XWPFAbstractFactory;
-import org.apache.xmlbeans.XmlCursor;
-import org.apache.xmlbeans.XmlCursor.TokenType;
-import org.openxmlformats.schemas.extendedproperties.CTProperties;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.microsoft.ooxml.OOXMLParser;
 
 @DataProvider(name = "excelFiles")
 public Object[] getExcelFiles() {
@@ -19,8 +16,7 @@ public Object[] getExcelFiles() {
         try (FileInputStream fis = new FileInputStream(file);
              XSSFWorkbook workbook = new XSSFWorkbook(fis)) {
 
-            POIXMLProperties properties = workbook.getProperties();
-            String internalName = getInternalName(properties);
+            String internalName = getInternalName(file);
 
             // Check if the internal workbook name is "Summary.xlsx"
             if (!internalName.equals("Summary.xlsx")) {
@@ -37,10 +33,16 @@ public Object[] getExcelFiles() {
 }
 
 // Helper method to extract internal workbook name
-private String getInternalName(POIXMLProperties properties) {
-    CTProperties customProps = properties.getCustomProperties();
-    if (customProps != null) {
-        return customProps.getUnderlyingProperties().getTitle();
+private String getInternalName(File file) {
+    try {
+        FileInputStream fis = new FileInputStream(file);
+        Metadata metadata = new Metadata();
+        new OOXMLParser().parse(fis, null, metadata);
+
+        // Retrieve the internal workbook name from the metadata
+        return metadata.get("Application-Name");
+    } catch (Exception e) {
+        e.printStackTrace();
+        return "";
     }
-    return "";
 }
