@@ -1,6 +1,9 @@
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.poi.POIXMLProperties;
+import org.apache.poi.poifs.filesystem.POIXMLProperties;
+import org.apache.poi.xwpf.usermodel.XWPFAbstractFactory;
 import org.apache.xmlbeans.XmlCursor;
+import org.apache.xmlbeans.XmlCursor.TokenType;
+import org.openxmlformats.schemas.extendedproperties.CTProperties;
 
 @DataProvider(name = "excelFiles")
 public Object[] getExcelFiles() {
@@ -35,17 +38,9 @@ public Object[] getExcelFiles() {
 
 // Helper method to extract internal workbook name
 private String getInternalName(POIXMLProperties properties) {
-    if (properties != null) {
-        POIXMLProperties.CoreProperties coreProperties = properties.getCoreProperties();
-        if (coreProperties != null) {
-            XmlCursor cursor = coreProperties.getUnderlyingProperties().newCursor();
-            cursor.selectPath("./*");
-            while (cursor.toNextSelection()) {
-                if (cursor.getName().getLocalPart().equals("title")) {
-                    return cursor.getChars();
-                }
-            }
-        }
+    CTProperties customProps = properties.getCustomProperties();
+    if (customProps != null) {
+        return customProps.getUnderlyingProperties().getTitle();
     }
     return "";
 }
