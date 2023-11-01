@@ -1,42 +1,111 @@
-import org.apache.commons.io.FileUtils;
-import java.io.File;
+import org.testng.*;
+import org.testng.xml.XmlSuite;
+import org.testng.xml.XmlTest;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.testng.annotations.Listeners;
+
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class DeleteSpecificExcelFileInFolder {
-    public static void main(String[] args) {
-        // Define the path to the folder where you want to search for and delete the specific Excel file
-        String folderPath = "your_folder_path_here";
+@Listeners(CustomExcelResultListener.class)
+public class TestClass {
+    @Test
+    public void testMethod1() {
+        // Your test code here
+        String testValue1 = "This is the value for testMethod1.";
+        CustomExcelResultListener.setTestValue(testValue1);
+    }
 
-        // Define the name of the specific Excel file you want to delete
-        String targetFileName = "specific_file.xlsx";
+    @Test
+    public void testMethod2() {
+        // Your test code here
+        String testValue2 = "This is the value for testMethod2.";
+        CustomExcelResultListener.setTestValue(testValue2);
+    }
 
-        // Create a File object for the folder
-        File folder = new File(folderPath);
+    // Add more test methods as needed
+}
 
-        // Check if the folder exists and is a directory
-        if (folder.exists() && folder.isDirectory()) {
-            // List all files in the folder
-            File[] files = folder.listFiles();
+class CustomExcelResultListener implements ITestListener, ISuiteListener {
+    private List<XSSFWorkbook> workbooks = new ArrayList<>();
+    private int testIndex = 0;
+    private static ThreadLocal<String> testValueThreadLocal = ThreadLocal.withInitial(() -> "");
 
-            if (files != null) {
-                for (File file : files) {
-                    // Check if the file has the specific name
-                    if (file.isFile() && file.getName().equals(targetFileName)) {
-                        // Delete the specific Excel file
-                        try {
-                            FileUtils.forceDelete(file);
-                            System.out.println("Deleted specific Excel file: " + file.getName());
-                        } catch (IOException e) {
-                            System.err.println("Failed to delete specific Excel file: " + file.getName());
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            } else {
-                System.out.println("No files found in the folder.");
+    public static void setTestValue(String value) {
+        testValueThreadLocal.set(value);
+    }
+
+    @Override
+    public void onStart(ISuite suite) {
+        // No action needed here
+    }
+
+    @Override
+    public void onFinish(ISuite suite) {
+        // Close all workbooks after all tests have executed
+        for (XSSFWorkbook workbook : workbooks) {
+            try (FileOutputStream fos = new FileOutputStream("TestResult_" + testIndex + ".xlsx")) {
+                workbook.write(fos);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } else {
-            System.err.println("The specified folder does not exist or is not a directory.");
+            testIndex++;
         }
     }
+
+    @Override
+    public void onTestStart(ITestResult result) {
+        // Create a new workbook for each test
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        workbooks.add(workbook);
+    }
+
+    @Override
+    public void onTestSuccess(ITestResult result) {
+        recordResult(result);
+    }
+
+    @Override
+    public void onTestFailure(ITestResult result) {
+        recordResult(result);
+    }
+
+    @Override
+    public void onTestSkipped(ITestResult result) {
+        recordResult(result);
+    }
+
+    @Override
+    public void onTestFailedButWithinSuccessPercentage(ITestResult result) {
+        recordResult(result);
+    }
+
+    private void recordResult(ITestResult result) {
+        int lastWorkbookIndex = workbooks.size() - 1;
+        XSSFWorkbook workbook = workbooks.get(lastWorkbookIndex);
+        XSSFSheet sheet = workbook.createSheet(result.getName());
+
+        // Record the result in the sheet
+        Row row = sheet.createRow(0);
+        Cell cell = row.createCell(0);
+
+        String testValue = testValueThreadLocal.get();
+        testValueThreadLocal.remove();
+
+        if (result.getStatus() == ITestResult.SUCCESS) {
+            cell.setCellValue("PASS");
+        } else if (result.getStatus() == ITestResult.FAILURE) {
+            cell.setCellValue("FAIL");
+        } else {
+            cell.setCellValue("SKIP");
+        }
+
+        // Record the test value in a separate cell
+        row.createCell(1).setCellValue(testValue);
+    }
+
+    // Implement other methods from ITestListener if needed
 }
