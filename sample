@@ -2,28 +2,36 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class ExcelSheetDataDeleter {
+public class ExcelSheetRenamer {
     public static void main(String[] args) {
-        try (Workbook workbook = WorkbookFactory.create(new File("existing.xlsx");
-             FileOutputStream fos = new FileOutputStream("existing.xlsx")) {
+        try (FileInputStream fis = new FileInputStream(new File("your_workbook.xlsx"));
+             Workbook workbook = new XSSFWorkbook(fis);
+             FileOutputStream fos = new FileOutputStream("your_workbook.xlsx")) {
 
-            // Get the sheet from which you want to delete data (e.g., the first sheet)
-            Sheet sheet = workbook.getSheetAt(0);
+            // Specify the old sheet name you want to rename
+            String oldSheetName = "Sheet1";
+            
+            // Specify the new sheet name
+            String newSheetName = "NewSheetName";
 
-            // Iterate through each row and cell in the sheet and remove the cell contents
-            for (Row row : sheet) {
-                for (Cell cell : row) {
-                    cell.setCellValue(""); // Clear the cell content
-                }
+            // Get the sheet with the old name
+            Sheet sheet = workbook.getSheet(oldSheetName);
+            
+            if (sheet != null) {
+                // Rename the sheet
+                workbook.setSheetName(workbook.getSheetIndex(sheet), newSheetName);
+            } else {
+                System.out.println("Sheet not found: " + oldSheetName);
             }
 
             // Write the changes back to the Excel file
             workbook.write(fos);
 
-            System.out.println("Data in the sheet has been cleared successfully.");
+            System.out.println("Sheet renamed successfully.");
 
         } catch (IOException e) {
             e.printStackTrace();
