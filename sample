@@ -1,29 +1,32 @@
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-@DataProvider(name = "excelFiles")
-public Object[] getExcelFiles() {
-    File folder = new File(EXCEL_FOLDER_PATH);
-    File[] files = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".xlsx"));
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
-    if (files == null) {
-        return new Object[0]; // Return an empty array if no files are found.
-    }
+public class ExcelSheetDataDeleter {
+    public static void main(String[] args) {
+        try (Workbook workbook = WorkbookFactory.create(new File("existing.xlsx");
+             FileOutputStream fos = new FileOutputStream("existing.xlsx")) {
 
-    List<Object> excelFileObjects = new ArrayList<>();
-    for (File file : files) {
-        try (FileInputStream fis = new FileInputStream(file)) {
-            XSSFWorkbook workbook = (XSSFWorkbook) WorkbookFactory.create(fis);
+            // Get the sheet from which you want to delete data (e.g., the first sheet)
+            Sheet sheet = workbook.getSheetAt(0);
 
-            // Check if the workbook name is "Summary.xlsx"
-            if (!workbook.getProperties().getExtendedProperties().getApplication().equals("Summary.xlsx")) {
-                ExcelFile excelFile = new ExcelFile(file.getName());
-                excelFileObjects.add(excelFile);
+            // Iterate through each row and cell in the sheet and remove the cell contents
+            for (Row row : sheet) {
+                for (Cell cell : row) {
+                    cell.setCellValue(""); // Clear the cell content
+                }
             }
+
+            // Write the changes back to the Excel file
+            workbook.write(fos);
+
+            System.out.println("Data in the sheet has been cleared successfully.");
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-    return excelFileObjects.toArray();
 }
