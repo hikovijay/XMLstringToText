@@ -1,18 +1,30 @@
-public class FileNameModifier {
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+public class ExcelSheetNameAtIndex {
     public static void main(String[] args) {
-        String fileName = "example.xlsx";
-        
-        // Remove the ".xlsx" extension
-        String fileNameWithoutExtension = removeFileExtension(fileName);
-        
-        System.out.println("Original File Name: " + fileName);
-        System.out.println("File Name without Extension: " + fileNameWithoutExtension);
-    }
-    
-    public static String removeFileExtension(String fileName) {
-        if (fileName != null && fileName.contains(".")) {
-            return fileName.substring(0, fileName.lastIndexOf('.'));
+        String filePath = "path/to/existing/excel/file.xlsx";
+
+        try {
+            String sheetName = getExcelSheetNameAtIndex(filePath, 0);
+            System.out.println("Sheet Name at Index 0: " + sheetName);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return fileName; // Return the original string if there is no extension.
+    }
+
+    public static String getExcelSheetNameAtIndex(String filePath, int index) throws IOException {
+        FileInputStream fis = new FileInputStream(filePath);
+        Workbook workbook = new XSSFWorkbook(fis); // For XLSX files
+
+        Sheet sheet = workbook.getSheetAt(index);
+        fis.close();
+
+        return sheet.getSheetName();
     }
 }
