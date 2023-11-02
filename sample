@@ -1,8 +1,47 @@
-<suite name="YourTestSuite" parallel="tests" thread-count="2">
-    <test name="Test1">
-        <classes>
-            <class name="your.package.ParallelTestExample"/>
-        </classes>
-    </test>
-    <!-- Add more <test> elements for additional tests if needed -->
-</suite>
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+
+public class ExcelDataCleanup {
+
+    public static String getColumnValues(String filePath, String sheetName) {
+        try {
+            FileInputStream fis = new FileInputStream(filePath);
+            Workbook workbook = new XSSFWorkbook(fis);
+            Sheet sheet = workbook.getSheet(sheetName); // Get the sheet by name
+
+            // Create a StringBuilder to store the concatenated values with newlines
+            StringBuilder columnValues = new StringBuilder();
+
+            for (Row row : sheet) {
+                Cell cell = row.getCell(0); // Assuming data is in the first column (column A)
+                if (cell != null) {
+                    // Get the value from the first column (column A)
+                    String cellValue = cell.getStringCellValue();
+
+                    // Append the cell value to the StringBuilder and add a newline
+                    columnValues.append(cellValue).append("\n");
+                }
+            }
+
+            fis.close();
+
+            return columnValues.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    public static void main(String[] args) {
+        String filePath = "input.xlsx"; // Replace with your input Excel file
+        String sheetName = "Sheet1"; // Replace with your sheet name
+
+        String columnValues = getColumnValues(filePath, sheetName);
+
+        // The entire first column's values (from row one onwards) are in columnValues
+        System.out.println("Column Values:\n" + columnValues);
+    }
+}
