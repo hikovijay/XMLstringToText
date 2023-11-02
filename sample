@@ -18,8 +18,8 @@ public class ExcelDataCleanup {
             for (Row row : sheet) {
                 Cell cell = row.getCell(0); // Assuming data is in the first column (column A)
                 if (cell != null) {
-                    // Get the value from the first column (column A)
-                    String cellValue = cell.getStringCellValue();
+                    // Convert the cell value to a string
+                    String cellValue = cell.toString();
 
                     // Append the cell value to the StringBuilder and add a newline
                     columnValues.append(cellValue).append("\n");
