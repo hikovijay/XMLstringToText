@@ -1,24 +1,58 @@
-public class StringBuilderToUTF8Converter {
-    public static void main(String[] args) {
-        StringBuilder inputBuilder = new StringBuilder();
-        inputBuilder.append("This is a large string builder content that we want to convert to UTF-8 format.");
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-        String inputString = inputBuilder.toString();
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+public class ExcelDataCombination {
+    public static String combineExcelData(String filePath, String sheetName, int maxColumns) {
+        StringBuilder combinedData = new StringBuilder();
 
         try {
-            // Convert the string to bytes in UTF-8 format
-            byte[] utf8Bytes = inputString.getBytes("UTF-8");
+            FileInputStream fileInputStream = new FileInputStream(new File(filePath));
+            Workbook workbook = new XSSFWorkbook(fileInputStream);
 
-            // Now you can use the utf8Bytes for further processing or writing to a file, for example
-            // If you want to convert it back to a string, you can do so using the constructor:
-            String convertedString = new String(utf8Bytes, "UTF-8");
+            Sheet sheet = workbook.getSheet(sheetName);
+            if (sheet == null) {
+                throw new IllegalArgumentException("Sheet not found: " + sheetName);
+            }
 
-            // Print the converted string
-            System.out.println("Original StringBuilder Content: " + inputBuilder.toString());
-            System.out.println("UTF-8 String: " + convertedString);
-        } catch (java.io.UnsupportedEncodingException e) {
-            System.err.println("UTF-8 encoding is not supported.");
+            for (Row row : sheet) {
+                boolean hasData = false;
+
+                for (int colIndex = 0; colIndex < maxColumns; colIndex++) {
+                    Cell cell = row.getCell(colIndex);
+
+                    if (cell != null) {
+                        String cellValue = cell.getStringCellValue().trim();
+                        if (!cellValue.isEmpty()) {
+                            if (hasData) {
+                                combinedData.append("\n");
+                            }
+
+                            combinedData.append(cellValue);
+                            hasData = true;
+                        }
+                    }
+                }
+            }
+
+            fileInputStream.close();
+            workbook.close();
+        } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return combinedData.toString();
+    }
+
+    public static void main(String[] args) {
+        String filePath = "input.xlsx"; // Replace with the path to your input Excel file
+        String sheetName = "Sheet1"; // Replace with the name of the sheet you want to process
+        int maxColumns = 4; // Set the maximum number of columns to combine
+
+        String combinedData = combineExcelData(filePath, sheetName, maxColumns);
+        System.out.println("Combined Data:\n" + combinedData);
     }
 }
