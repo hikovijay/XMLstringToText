@@ -1,6 +1,9 @@
-public class StringToUTF8Converter {
+public class StringBuilderToUTF8Converter {
     public static void main(String[] args) {
-        String inputString = "This is a large string that we want to convert to UTF-8 format.";
+        StringBuilder inputBuilder = new StringBuilder();
+        inputBuilder.append("This is a large string builder content that we want to convert to UTF-8 format.");
+
+        String inputString = inputBuilder.toString();
 
         try {
             // Convert the string to bytes in UTF-8 format
@@ -11,7 +14,7 @@ public class StringToUTF8Converter {
             String convertedString = new String(utf8Bytes, "UTF-8");
 
             // Print the converted string
-            System.out.println("Original String: " + inputString);
+            System.out.println("Original StringBuilder Content: " + inputBuilder.toString());
             System.out.println("UTF-8 String: " + convertedString);
         } catch (java.io.UnsupportedEncodingException e) {
             System.err.println("UTF-8 encoding is not supported.");
