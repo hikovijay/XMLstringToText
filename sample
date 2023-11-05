@@ -25,10 +25,10 @@ public class ExcelDataCombination {
                     Cell cell = row.getCell(colIndex);
 
                     if (cell != null) {
-                        String cellValue = cell.getStringCellValue().trim();
+                        String cellValue = cell.getStringCellValue();
                         if (!cellValue.isEmpty()) {
                             if (hasData) {
-                                combinedData.append("\n");
+                                combinedData.append(System.lineSeparator());
                             }
 
                             combinedData.append(cellValue);
