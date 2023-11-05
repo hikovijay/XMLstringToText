@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-public class ExcelDataCombination {
+public class ExcelDataCombinationWithConditions {
     public static String combineExcelData(String filePath, String sheetName, int maxColumns) {
         StringBuilder combinedData = new StringBuilder();
 
@@ -31,7 +31,26 @@ public class ExcelDataCombination {
                                 combinedData.append(System.lineSeparator());
                             }
 
-                            combinedData.append(cellValue);
+                            if (colIndex == 1) {
+                                // Condition for Column B
+                                if (cellValue.contains("SpecificConditionB")) {
+                                    combinedData.append("B: ").append(cellValue);
+                                }
+                            } else if (colIndex == 2) {
+                                // Condition for Column C
+                                if (cellValue.contains("SpecificConditionC")) {
+                                    combinedData.append("C: ").append(cellValue);
+                                }
+                            } else if (colIndex == 3) {
+                                // Condition for Column D
+                                if (cellValue.contains("SpecificConditionD")) {
+                                    combinedData.append("D: ").append(cellValue);
+                                }
+                            } else {
+                                // For other columns, simply append the value
+                                combinedData.append(cellValue);
+                            }
+
                             hasData = true;
                         }
                     }
