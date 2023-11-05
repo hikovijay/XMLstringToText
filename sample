@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-public class ExcelDataCombinationWithConditions {
+public class ExcelDataCombinationWithAnyData {
     public static String combineExcelData(String filePath, String sheetName, int maxColumns) {
         StringBuilder combinedData = new StringBuilder();
 
@@ -28,24 +28,21 @@ public class ExcelDataCombinationWithConditions {
                         String cellValue = cell.getStringCellValue();
                         if (!cellValue.isEmpty()) {
                             if (hasData) {
-                                combinedData.append(System.lineSeparator());
+                                combinedData.append("\n");
                             }
 
-                            if (colIndex == 1) {
+                            if (colIndex == 0) {
+                                // Condition for Column A
+                                combinedData.append("A: ").append(cellValue);
+                            } else if (colIndex == 1) {
                                 // Condition for Column B
-                                if (cellValue.contains("SpecificConditionB")) {
-                                    combinedData.append("B: ").append(cellValue);
-                                }
+                                combinedData.append("B: ").append(cellValue);
                             } else if (colIndex == 2) {
                                 // Condition for Column C
-                                if (cellValue.contains("SpecificConditionC")) {
-                                    combinedData.append("C: ").append(cellValue);
-                                }
+                                combinedData.append("C: ").append(cellValue);
                             } else if (colIndex == 3) {
                                 // Condition for Column D
-                                if (cellValue.contains("SpecificConditionD")) {
-                                    combinedData.append("D: ").append(cellValue);
-                                }
+                                combinedData.append("D: ").append(cellValue);
                             } else {
                                 // For other columns, simply append the value
                                 combinedData.append(cellValue);
