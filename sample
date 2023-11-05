@@ -1,13 +1,21 @@
-String largeStringValue1 = "Your first large string value";
-String largeStringValue2 = "Your second large string value";
-String result = "Initial value for the result string"; // The string you want to update
+public class StringToUTF8Converter {
+    public static void main(String[] args) {
+        String inputString = "This is a large string that we want to convert to UTF-8 format.";
 
-if (largeStringValue1.equals(largeStringValue2)) {
-    // If the two large string values are equal
-    result = "Strings are equal";
-} else if (largeStringValue1.isEmpty() && largeStringValue2.isEmpty()) {
-    // If both large string values are empty
-    result = "Both strings are empty";
+        try {
+            // Convert the string to bytes in UTF-8 format
+            byte[] utf8Bytes = inputString.getBytes("UTF-8");
+
+            // Now you can use the utf8Bytes for further processing or writing to a file, for example
+            // If you want to convert it back to a string, you can do so using the constructor:
+            String convertedString = new String(utf8Bytes, "UTF-8");
+
+            // Print the converted string
+            System.out.println("Original String: " + inputString);
+            System.out.println("UTF-8 String: " + convertedString);
+        } catch (java.io.UnsupportedEncodingException e) {
+            System.err.println("UTF-8 encoding is not supported.");
+            e.printStackTrace();
+        }
+    }
 }
-
-// If none of the above conditions match, you can continue with the rest of your code
