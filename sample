@@ -1,46 +1,20 @@
-for (int colIndex = 0; colIndex < maxColumns; colIndex++) {
-    Cell cell = row.getCell(colIndex);
+String originalString = "This is a string with three trailing tabs\t\t\t";
+int tabsToTrim = 2; // Specify the number of tabs to trim
 
-    if (cell != null) {
-        String cellValue = cell.getStringCellValue();
+if (originalString.endsWith("\t")) {
+    int length = originalString.length();
+    int trimCount = 0;
 
-        // Check if the cell contains valid data (including spaces and tabs)
-        if (isValidData(cellValue)) {
-            if (colIndex == 0) {
-                // Condition for Column A
-                combinedData.append("A: ").append(cellValue);
-            } else if (colIndex == 1) {
-                // Condition for Column B
-                if (/* Add tabs or spaces condition for Column B */) {
-                    combinedData.append("\t\t"); // Add tabs or spaces before the value
-                }
-                combinedData.append("B: ").append(cellValue);
-                if (/* Add tabs or spaces condition for Column B */) {
-                    combinedData.append("\t\t"); // Add tabs or spaces after the value
-                }
-            } else if (colIndex == 2) {
-                // Condition for Column C
-                if (/* Add tabs or spaces condition for Column C */) {
-                    combinedData.append("\t\t"); // Add tabs or spaces before the value
-                }
-                combinedData.append("C: ").append(cellValue);
-                if (/* Add tabs or spaces condition for Column C */) {
-                    combinedData.append("\t\t"); // Add tabs or spaces after the value
-                }
-            } else if (colIndex == 3) {
-                // Condition for Column D
-                if (/* Add tabs or spaces condition for Column D */) {
-                    combinedData.append("\t\t"); // Add tabs or spaces before the value
-                }
-                combinedData.append("D: ").append(cellValue);
-                if (/* Add tabs or spaces condition for Column D */) {
-                    combinedData.append("\t\t"); // Add tabs or spaces after the value
-                }
-            } else {
-                // For other columns, simply append the value
-                combinedData.append(cellValue);
-            }
+    while (trimCount < tabsToTrim) {
+        if (originalString.charAt(length - 1) == '\t') {
+            length--;
+            trimCount++;
+        } else {
+            break; // Exit the loop if a non-tab character is encountered
         }
     }
-    combinedData.append("\n"); // Add a new line after each row
+
+    originalString = originalString.substring(0, length);
 }
+
+System.out.println(originalString);
