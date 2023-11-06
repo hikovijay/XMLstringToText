@@ -1,74 +1,21 @@
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+public static void trimTrailingTabs(StringBuilder sb, int numTabsToTrim) {
+    int length = sb.length();
+    int tabsTrimmed = 0;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-
-public class ExcelDataCombinationWithAnyData {
-    public static String combineExcelData(String filePath, String sheetName, int maxColumns) {
-        StringBuilder combinedData = new StringBuilder();
-
-        try {
-            FileInputStream fileInputStream = new FileInputStream(new File(filePath));
-            Workbook workbook = new XSSFWorkbook(fileInputStream);
-
-            Sheet sheet = workbook.getSheet(sheetName);
-            if (sheet == null) {
-                throw new IllegalArgumentException("Sheet not found: " + sheetName);
-            }
-
-            for (Row row : sheet) {
-                boolean hasData = false;
-
-                for (int colIndex = 0; colIndex < maxColumns; colIndex++) {
-                    Cell cell = row.getCell(colIndex);
-
-                    if (cell != null) {
-                        String cellValue = cell.getStringCellValue();
-                        if (!cellValue.isEmpty()) {
-                            if (hasData) {
-                                combinedData.append("\n");
-                            }
-
-                            if (colIndex == 0) {
-                                // Condition for Column A
-                                combinedData.append("A: ").append(cellValue);
-                            } else if (colIndex == 1) {
-                                // Condition for Column B
-                                combinedData.append("B: ").append(cellValue);
-                            } else if (colIndex == 2) {
-                                // Condition for Column C
-                                combinedData.append("C: ").append(cellValue);
-                            } else if (colIndex == 3) {
-                                // Condition for Column D
-                                combinedData.append("D: ").append(cellValue);
-                            } else {
-                                // For other columns, simply append the value
-                                combinedData.append(cellValue);
-                            }
-
-                            hasData = true;
-                        }
-                    }
-                }
-            }
-
-            fileInputStream.close();
-            workbook.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+    while (length > 0 && tabsTrimmed < numTabsToTrim) {
+        if (sb.charAt(length - 1) == '\t') {
+            sb.deleteCharAt(length - 1);
+            tabsTrimmed++;
+        } else {
+            break; // Exit the loop if a non-tab character is encountered
         }
-
-        return combinedData.toString();
+        length = sb.length();
     }
+}
 
-    public static void main(String[] args) {
-        String filePath = "input.xlsx"; // Replace with the path to your input Excel file
-        String sheetName = "Sheet1"; // Replace with the name of the sheet you want to process
-        int maxColumns = 4; // Set the maximum number of columns to combine
-
-        String combinedData = combineExcelData(filePath, sheetName, maxColumns);
-        System.out.println("Combined Data:\n" + combinedData);
-    }
+public static void main(String[] args) {
+    StringBuilder sb = new StringBuilder("Some text with tabs at the end\t\t\t");
+    int numTabsToTrim = 2; // Specify the number of tabs to trim
+    trimTrailingTabs(sb, numTabsToTrim);
+    System.out.println(sb.toString());
 }
