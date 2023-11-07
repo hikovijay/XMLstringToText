@@ -1,20 +1,32 @@
-String originalString = "This is a string with three trailing tabs\t\t\t";
-int tabsToTrim = 2; // Specify the number of tabs to trim
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
-if (originalString.endsWith("\t")) {
-    int length = originalString.length();
-    int trimCount = 0;
+public class FileContentReader {
+    public static String readFileToString(String filePath) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath)) {
+            StringBuilder content = new StringBuilder();
+            String line;
 
-    while (trimCount < tabsToTrim) {
-        if (originalString.charAt(length - 1) == '\t') {
-            length--;
-            trimCount++;
-        } else {
-            break; // Exit the loop if a non-tab character is encountered
+            while ((line = br.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+
+            return content.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null; // Return null in case of an error
         }
     }
 
-    originalString = originalString.substring(0, length);
-}
+    public static void main(String[] args) {
+        String filePath = "path/to/your/notepad/file.txt"; // Replace with the path to your Notepad file
+        String fileContents = readFileToString(filePath);
 
-System.out.println(originalString);
+        if (fileContents != null) {
+            System.out.println("File Contents:\n" + fileContents);
+        } else {
+            System.out.println("Error reading the file.");
+        }
+    }
+}
