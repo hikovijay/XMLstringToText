@@ -1,32 +1,44 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
-public class FileContentReader {
-    public static String readFileToString(String filePath) {
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath)) {
-            StringBuilder content = new StringBuilder();
-            String line;
+/*
+ * Java Program read a text file as String 
+ * first by using the JDK 7 utility method Files.readAllBytes()
+ * and second by using BufferedReader and StringBuilder.
+ */
 
-            while ((line = br.readLine()) != null) {
-                content.append(line).append("\n");
-            }
+public class ReadFileAsString {
 
-            return content.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null; // Return null in case of an error
-        }
+  public static void main(String[] args) throws Exception {
+
+    // read whole file as String in JDK 7
+    String data = "";
+    try {
+      data = new String(Files.readAllBytes(Paths.get("file.txt")));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    System.out.println("Text file as String in Java");
+    System.out.println(data);
+
+    // read file as String in Java SE 6 and lower version
+    BufferedReader br = new BufferedReader(new FileReader("file.txt"));
+    StringBuilder sb = new StringBuilder();
+
+    String line = br.readLine();
+    while (line != null) {
+      sb.append(line).append("\n");
+      line = br.readLine();
     }
 
-    public static void main(String[] args) {
-        String filePath = "path/to/your/notepad/file.txt"; // Replace with the path to your Notepad file
-        String fileContents = readFileToString(filePath);
+    String fileAsString = sb.toString();
+    System.out
+        .println("whole file as String using BufferedReader and StringBuilder");
+    System.out.println(fileAsString);
 
-        if (fileContents != null) {
-            System.out.println("File Contents:\n" + fileContents);
-        } else {
-            System.out.println("Error reading the file.");
-        }
-    }
+    br.close();
+  }
 }
