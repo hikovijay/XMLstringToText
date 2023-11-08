@@ -1,44 +1,37 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 
-/*
- * Java Program read a text file as String 
- * first by using the JDK 7 utility method Files.readAllBytes()
- * and second by using BufferedReader and StringBuilder.
- */
+public class PopupHandlingExample {
+    public static void main(String[] args) {
+        System.setProperty("webdriver.chrome.driver", "path/to/chromedriver.exe");
+        WebDriver driver = new ChromeDriver();
+        
+        // Open a website with a pop-up
+        driver.get("https://www.example.com");
 
-public class ReadFileAsString {
+        // Locate the element that triggers the pop-up
+        driver.findElement(By.id("popup-button")).click();
 
-  public static void main(String[] args) throws Exception {
+        // Switch to the pop-up
+        Alert alert = driver.switchTo().alert();
 
-    // read whole file as String in JDK 7
-    String data = "";
-    try {
-      data = new String(Files.readAllBytes(Paths.get("file.txt")));
-    } catch (IOException e) {
-      e.printStackTrace();
+        // Get the text from the pop-up and print it
+        System.out.println("Pop-up Text: " + alert.getText());
+
+        // Accept the pop-up (click OK)
+        alert.accept();
+
+        // You can also dismiss the pop-up (click Cancel) using alert.dismiss()
+
+        // After handling the pop-up, switch back to the main window
+        driver.switchTo().defaultContent();
+        
+        // Continue with your testing or interactions with the main window
+        // ...
+
+        // Close the WebDriver
+        driver.quit();
     }
-    System.out.println("Text file as String in Java");
-    System.out.println(data);
-
-    // read file as String in Java SE 6 and lower version
-    BufferedReader br = new BufferedReader(new FileReader("file.txt"));
-    StringBuilder sb = new StringBuilder();
-
-    String line = br.readLine();
-    while (line != null) {
-      sb.append(line).append("\n");
-      line = br.readLine();
-    }
-
-    String fileAsString = sb.toString();
-    System.out
-        .println("whole file as String using BufferedReader and StringBuilder");
-    System.out.println(fileAsString);
-
-    br.close();
-  }
 }
