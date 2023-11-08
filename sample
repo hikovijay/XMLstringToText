@@ -1,37 +1,22 @@
-import org.openqa.selenium.Alert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
+import java.util.ArrayList;
+import java.util.List;
 
-public class PopupHandlingExample {
+public class SplitStringList {
     public static void main(String[] args) {
-        System.setProperty("webdriver.chrome.driver", "path/to/chromedriver.exe");
-        WebDriver driver = new ChromeDriver();
-        
-        // Open a website with a pop-up
-        driver.get("https://www.example.com");
+        // Create a list with two string values
+        List<String> stringList = new ArrayList<>();
+        stringList.add("Value1");
+        stringList.add("Value2");
 
-        // Locate the element that triggers the pop-up
-        driver.findElement(By.id("popup-button")).click();
+        // Access the elements and store them in separate variables
+        if (stringList.size() >= 2) {
+            String value1 = stringList.get(0);
+            String value2 = stringList.get(1);
 
-        // Switch to the pop-up
-        Alert alert = driver.switchTo().alert();
-
-        // Get the text from the pop-up and print it
-        System.out.println("Pop-up Text: " + alert.getText());
-
-        // Accept the pop-up (click OK)
-        alert.accept();
-
-        // You can also dismiss the pop-up (click Cancel) using alert.dismiss()
-
-        // After handling the pop-up, switch back to the main window
-        driver.switchTo().defaultContent();
-        
-        // Continue with your testing or interactions with the main window
-        // ...
-
-        // Close the WebDriver
-        driver.quit();
+            System.out.println("Value1: " + value1);
+            System.out.println("Value2: " + value2);
+        } else {
+            System.out.println("The list does not contain at least two values.");
+        }
     }
 }
