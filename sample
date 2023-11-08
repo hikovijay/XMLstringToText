@@ -1,22 +1,46 @@
-import java.util.ArrayList;
-import java.util.List;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-public class SplitStringList {
-    public static void main(String[] args) {
-        // Create a list with two string values
-        List<String> stringList = new ArrayList<>();
-        stringList.add("Value1");
-        stringList.add("Value2");
+import java.io.*;
 
-        // Access the elements and store them in separate variables
-        if (stringList.size() >= 2) {
-            String value1 = stringList.get(0);
-            String value2 = stringList.get(1);
+public class ExcelWriter {
+    public static void writeValueToExcelCell(String filePath, String sheetName, int rowNumber, int columnNumber, String valueToWrite) {
+        try {
+            FileInputStream fileInputStream = new FileInputStream(filePath);
+            Workbook workbook = new XSSFWorkbook(fileInputStream);
+            Sheet sheet = workbook.getSheet(sheetName);
 
-            System.out.println("Value1: " + value1);
-            System.out.println("Value2: " + value2);
-        } else {
-            System.out.println("The list does not contain at least two values.");
+            if (sheet == null) {
+                System.err.println("Sheet not found: " + sheetName);
+                return;
+            }
+
+            Row row = sheet.getRow(rowNumber - 1); // -1 because Excel rows are 0-based
+            if (row == null) {
+                row = sheet.createRow(rowNumber - 1);
+            }
+
+            Cell cell = row.createCell(columnNumber - 1, CellType.STRING); // -1 because Excel columns are 0-based
+
+            cell.setCellValue(valueToWrite);
+
+            FileOutputStream fileOutputStream = new FileOutputStream(filePath);
+            workbook.write(fileOutputStream);
+            fileOutputStream.close();
+
+            System.out.println("Value '" + valueToWrite + "' written to row " + rowNumber + ", column " + columnNumber + " in sheet '" + sheetName + "'");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
+
+    public static void main(String[] args) {
+        String filePath = "path/to/your/excel/file.xlsx";
+        String sheetName = "Sheet1";
+        int rowNumber = 2; // Change to the desired row number
+        int columnNumber = 3; // Change to the desired column number
+        String valueToWrite = "Hello, Excel!"; // Change to the desired value
+
+        writeValueToExcelCell(filePath, sheetName, rowNumber, columnNumber, valueToWrite);
     }
 }
