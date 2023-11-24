@@ -12,47 +12,31 @@ public class ExcelReadWriteExample {
         String sheetName = "Sheet1";
 
         try {
-            int lastRowIndex = getLastRowIndex(filePath, sheetName);
-            writeDataToNextRow(filePath, sheetName, lastRowIndex + 1, "New Data 1", "New Data 2");
+            FileInputStream fileInputStream = new FileInputStream(new File(filePath));
+            Workbook workbook = WorkbookFactory.create(fileInputStream);
+
+            Sheet sheet = workbook.getSheet(sheetName);
+
+            int lastRowIndex = sheet.getLastRowNum();
+
+            Row row = sheet.createRow(lastRowIndex + 1);
+
+            Cell cell1 = row.createCell(0);
+            cell1.setCellValue("New Data 1");
+
+            Cell cell2 = row.createCell(1);
+            cell2.setCellValue("New Data 2");
+
+            FileOutputStream fileOutputStream = new FileOutputStream(new File(filePath));
+            workbook.write(fileOutputStream);
+
+            workbook.close();
+            fileInputStream.close();
+            fileOutputStream.close();
+
             System.out.println("Data written successfully.");
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private static int getLastRowIndex(String filePath, String sheetName) throws IOException {
-        FileInputStream fileInputStream = new FileInputStream(new File(filePath));
-        Workbook workbook = WorkbookFactory.create(fileInputStream);
-
-        Sheet sheet = workbook.getSheet(sheetName);
-
-        int lastRowIndex = sheet.getLastRowNum();
-
-        workbook.close();
-        fileInputStream.close();
-
-        return lastRowIndex;
-    }
-
-    private static void writeDataToNextRow(String filePath, String sheetName, int rowIndex, String... data) throws IOException {
-        FileInputStream fileInputStream = new FileInputStream(new File(filePath));
-        Workbook workbook = WorkbookFactory.create(fileInputStream);
-
-        Sheet sheet = workbook.getSheet(sheetName);
-
-        Row row = sheet.createRow(rowIndex);
-
-        int cellIndex = 0;
-        for (String value : data) {
-            Cell cell = row.createCell(cellIndex++);
-            cell.setCellValue(value);
-        }
-
-        FileOutputStream fileOutputStream = new FileOutputStream(new File(filePath));
-        workbook.write(fileOutputStream);
-
-        workbook.close();
-        fileInputStream.close();
-        fileOutputStream.close();
     }
 }
