@@ -1,46 +1,43 @@
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
-public class ExcelWriter {
-    public static void writeValueToExcelCell(String filePath, String sheetName, int rowNumber, int columnNumber, String valueToWrite) {
+public class ExcelFileUtils {
+
+    public static void main(String[] args) {
+        String filePath = "path/to/your/excel/file.xlsx";
+
         try {
-            FileInputStream fileInputStream = new FileInputStream(filePath);
-            Workbook workbook = new XSSFWorkbook(fileInputStream);
-            Sheet sheet = workbook.getSheet(sheetName);
-
-            if (sheet == null) {
-                System.err.println("Sheet not found: " + sheetName);
-                return;
+            int lastRowIndex = getLastRowIndexIfExists(filePath);
+            if (lastRowIndex >= 0) {
+                System.out.println("Last row index: " + lastRowIndex);
+            } else {
+                System.out.println("File does not exist: " + filePath);
             }
-
-            Row row = sheet.getRow(rowNumber - 1); // -1 because Excel rows are 0-based
-            if (row == null) {
-                row = sheet.createRow(rowNumber - 1);
-            }
-
-            Cell cell = row.createCell(columnNumber - 1, CellType.STRING); // -1 because Excel columns are 0-based
-
-            cell.setCellValue(valueToWrite);
-
-            FileOutputStream fileOutputStream = new FileOutputStream(filePath);
-            workbook.write(fileOutputStream);
-            fileOutputStream.close();
-
-            System.out.println("Value '" + valueToWrite + "' written to row " + rowNumber + ", column " + columnNumber + " in sheet '" + sheetName + "'");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void main(String[] args) {
-        String filePath = "path/to/your/excel/file.xlsx";
-        String sheetName = "Sheet1";
-        int rowNumber = 2; // Change to the desired row number
-        int columnNumber = 3; // Change to the desired column number
-        String valueToWrite = "Hello, Excel!"; // Change to the desired value
+    public static int getLastRowIndexIfExists(String filePath) throws IOException {
+        File file = new File(filePath);
 
-        writeValueToExcelCell(filePath, sheetName, rowNumber, columnNumber, valueToWrite);
+        if (file.exists() && file.isFile()) {
+            FileInputStream fileInputStream = new FileInputStream(file);
+            Workbook workbook = WorkbookFactory.create(fileInputStream);
+
+            Sheet sheet = workbook.getSheetAt(0); // Assuming you are working with the first sheet
+
+            int lastRowIndex = sheet.getLastRowNum();
+
+            workbook.close();
+            fileInputStream.close();
+
+            return lastRowIndex;
+        } else {
+            return -1; // Return -1 if the file does not exist
+        }
     }
 }
