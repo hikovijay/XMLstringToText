@@ -1,0 +1,46 @@
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class FileDownloadExample {
+
+    public static void main(String[] args) {
+        // Set the path to your chromedriver executable
+        System.setProperty("webdriver.chrome.driver", "path/to/chromedriver");
+
+        // Set the download folder path
+        String downloadFolderPath = "path/to/download/folder";
+
+        // Set Chrome options
+        ChromeOptions options = new ChromeOptions();
+
+        // Specify download preferences
+        Map<String, Object> prefs = new HashMap<>();
+        prefs.put("download.default_directory", downloadFolderPath);
+        options.setExperimentalOption("prefs", prefs);
+
+        // Start Chrome WebDriver with the configured options
+        WebDriver driver = new ChromeDriver(options);
+
+        // Navigate to a page with a download link
+        driver.get("https://example.com");
+
+        // Click on the download link or perform the actions that trigger the download
+        driver.findElement(By.linkText("Download File")).click();
+
+        // Wait for the download to complete (adjust timeout as needed)
+        WebDriverWait wait = new WebDriverWait(driver, 60); // 60 seconds timeout
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("downloadInProgress")));
+
+        // Perform any additional actions as needed
+
+        // Quit the WebDriver
+        driver.quit();
+    }
+}
