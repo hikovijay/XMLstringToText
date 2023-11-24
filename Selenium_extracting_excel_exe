@@ -1,0 +1,55 @@
+import java.io.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+public class UnzipExcelAndExeFilesExample {
+
+    public static void main(String[] args) {
+        String zipFilePath = "path/to/your/archive.zip";
+        String destDirectory = "path/to/destination/folder";
+
+        try {
+            unzipExcelAndExeFiles(zipFilePath, destDirectory);
+            System.out.println("Excel and .exe files extracted successfully.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void unzipExcelAndExeFiles(String zipFilePath, String destDirectory) throws IOException {
+        File destDir = new File(destDirectory);
+        if (!destDir.exists()) {
+            destDir.mkdirs();
+        }
+
+        try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zipFilePath))) {
+            ZipEntry entry = zipInputStream.getNextEntry();
+
+            while (entry != null) {
+                String entryName = entry.getName();
+                String filePath = destDirectory + File.separator + entryName;
+
+                if (!entry.isDirectory() && isExcelOrExeFile(entryName)) {
+                    extractFile(zipInputStream, filePath);
+                }
+
+                zipInputStream.closeEntry();
+                entry = zipInputStream.getNextEntry();
+            }
+        }
+    }
+
+    private static boolean isExcelOrExeFile(String fileName) {
+        return fileName.endsWith(".xls") || fileName.endsWith(".xlsx") || fileName.endsWith(".exe");
+    }
+
+    private static void extractFile(ZipInputStream zipInputStream, String filePath) throws IOException {
+        try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath))) {
+            byte[] bytesIn = new byte[4096];
+            int read;
+            while ((read = zipInputStream.read(bytesIn)) != -1) {
+                bos.write(bytesIn, 0, read);
+            }
+        }
+    }
+}
