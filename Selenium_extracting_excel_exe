@@ -1,8 +1,11 @@
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class UnzipExcelAndExeFilesExample {
+
+    private static final int BUFFER_SIZE = 4096;
 
     public static void main(String[] args) {
         String zipFilePath = "path/to/your/archive.zip";
@@ -10,7 +13,10 @@ public class UnzipExcelAndExeFilesExample {
 
         File destDir = new File(destDirectory);
         if (!destDir.exists()) {
-            destDir.mkdirs();
+            if (!destDir.mkdirs()) {
+                System.out.println("Failed to create destination directory.");
+                return;
+            }
         }
 
         try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zipFilePath))) {
@@ -18,11 +24,18 @@ public class UnzipExcelAndExeFilesExample {
 
             while (entry != null) {
                 String entryName = entry.getName();
-                String filePath = destDirectory + File.separator + entryName;
+                String filePath = Paths.get(destDirectory, entryName).toString();
 
                 if (!entry.isDirectory() && (entryName.endsWith(".xls") || entryName.endsWith(".xlsx") || entryName.endsWith(".exe"))) {
+                    // Ensure that the parent directories exist
+                    File parentDir = new File(filePath).getParentFile();
+                    if (!parentDir.exists() && !parentDir.mkdirs()) {
+                        System.out.println("Failed to create parent directory for: " + filePath);
+                        continue; // Skip this entry
+                    }
+
                     try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath))) {
-                        byte[] bytesIn = new byte[4096];
+                        byte[] bytesIn = new byte[BUFFER_SIZE];
                         int read;
                         while ((read = zipInputStream.read(bytesIn)) != -1) {
                             bos.write(bytesIn, 0, read);
@@ -35,17 +48,17 @@ public class UnzipExcelAndExeFilesExample {
             }
 
             System.out.println("Excel and .exe files extracted successfully.");
-
-            // Delete the ZIP file after successful extraction
-            File zipFile = new File(zipFilePath);
-            if (zipFile.delete()) {
-                System.out.println("ZIP file deleted successfully.");
-            } else {
-                System.out.println("Failed to delete ZIP file.");
-            }
-
         } catch (IOException e) {
             e.printStackTrace();
+            // Handle specific exceptions if needed
+        }
+
+        // Delete the ZIP file after successful extraction
+        File zipFile = new File(zipFilePath);
+        if (zipFile.delete()) {
+            System.out.println("ZIP file deleted successfully.");
+        } else {
+            System.out.println("Failed to delete ZIP file.");
         }
     }
 }
