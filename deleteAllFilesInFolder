@@ -1,0 +1,37 @@
+import java.io.File;
+
+public class DeleteFilesInFolder {
+    public static void main(String[] args) {
+        // Specify the path to the folder
+        String folderPath = "/path/to/your/folder";
+
+        // Create a File object representing the folder
+        File folder = new File(folderPath);
+
+        // Check if the folder exists
+        if (folder.exists() && folder.isDirectory()) {
+            // Get all files in the folder
+            File[] files = folder.listFiles();
+
+            // Check if there are any files
+            if (files != null) {
+                // Loop through the files and delete each one
+                for (File file : files) {
+                    if (file.isFile()) {
+                        if (file.delete()) {
+                            System.out.println("Deleted file: " + file.getName());
+                        } else {
+                            System.out.println("Failed to delete file: " + file.getName());
+                        }
+                    }
+                }
+
+                System.out.println("All files in the folder have been deleted.");
+            } else {
+                System.out.println("No files found in the folder.");
+            }
+        } else {
+            System.out.println("The specified folder does not exist or is not a directory.");
+        }
+    }
+}
