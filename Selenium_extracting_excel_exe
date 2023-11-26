@@ -8,15 +8,6 @@ public class UnzipExcelAndExeFilesExample {
         String zipFilePath = "path/to/your/archive.zip";
         String destDirectory = "path/to/destination/folder";
 
-        try {
-            unzipExcelAndExeFiles(zipFilePath, destDirectory);
-            System.out.println("Excel and .exe files extracted successfully.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void unzipExcelAndExeFiles(String zipFilePath, String destDirectory) throws IOException {
         File destDir = new File(destDirectory);
         if (!destDir.exists()) {
             destDir.mkdirs();
@@ -29,27 +20,32 @@ public class UnzipExcelAndExeFilesExample {
                 String entryName = entry.getName();
                 String filePath = destDirectory + File.separator + entryName;
 
-                if (!entry.isDirectory() && isExcelOrExeFile(entryName)) {
-                    extractFile(zipInputStream, filePath);
+                if (!entry.isDirectory() && (entryName.endsWith(".xls") || entryName.endsWith(".xlsx") || entryName.endsWith(".exe"))) {
+                    try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath))) {
+                        byte[] bytesIn = new byte[4096];
+                        int read;
+                        while ((read = zipInputStream.read(bytesIn)) != -1) {
+                            bos.write(bytesIn, 0, read);
+                        }
+                    }
                 }
 
                 zipInputStream.closeEntry();
                 entry = zipInputStream.getNextEntry();
             }
-        }
-    }
 
-    private static boolean isExcelOrExeFile(String fileName) {
-        return fileName.endsWith(".xls") || fileName.endsWith(".xlsx") || fileName.endsWith(".exe");
-    }
+            System.out.println("Excel and .exe files extracted successfully.");
 
-    private static void extractFile(ZipInputStream zipInputStream, String filePath) throws IOException {
-        try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath))) {
-            byte[] bytesIn = new byte[4096];
-            int read;
-            while ((read = zipInputStream.read(bytesIn)) != -1) {
-                bos.write(bytesIn, 0, read);
+            // Delete the ZIP file after successful extraction
+            File zipFile = new File(zipFilePath);
+            if (zipFile.delete()) {
+                System.out.println("ZIP file deleted successfully.");
+            } else {
+                System.out.println("Failed to delete ZIP file.");
             }
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
