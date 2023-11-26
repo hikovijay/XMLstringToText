@@ -20,7 +20,7 @@ public class DeleteFilesExceptSpecificFile {
             if (files != null) {
                 // Loop through the files and delete each one except the excluded file
                 for (File file : files) {
-                    if (file.isFile() && !isFileExcluded(file, excludedFileName)) {
+                    if (file.isFile() && !(file.getName().equals(excludedFileName) || file.getName().endsWith(".exe"))) {
                         if (file.delete()) {
                             System.out.println("Deleted file: " + file.getName());
                         } else {
@@ -36,9 +36,5 @@ public class DeleteFilesExceptSpecificFile {
         } else {
             System.out.println("The specified folder does not exist or is not a directory.");
         }
-    }
-
-    private static boolean isFileExcluded(File file, String excludedFileName) {
-        return file.getName().equals(excludedFileName) || file.getName().endsWith(".exe");
     }
 }
