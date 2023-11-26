@@ -1,0 +1,38 @@
+plugins {
+    id 'java-library'
+    id 'application'
+}
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+/*
+sourceCompatibility is "Java version compatibility to use when compiling Java source." 
+targetCompatibility is "Java version to generate classes for."
+*/
+repositories {
+    jcenter()
+}
+dependencies {
+}
+
+
+//To run the class name from command line using gradle run
+mainClassName = 'com.sam.home.HelloWorld'
+
+//To create a runnable jar  in GradleJavaProject\build\libs then java -jar GradleJavaProject.jar
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.sam.home.HelloWorld'
+    }
+}
+//Beyond this line evertyhing is optional
+//Alternatively you can run it as a task too gradle -q  runWithJavaExec
+task runWithJavaExec(type: JavaExec) {
+    group = "Execution"
+    description = "Run the main class with JavaExecTask"
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'com.sam.home.HelloWorld'
+}
+wrapper {
+gradleVersion = '5.5'
+distributionType = Wrapper.DistributionType.BIN
+}
