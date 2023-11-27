@@ -1,5 +1,5 @@
 import java.io.*;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -9,11 +9,11 @@ public class UnzipExcelAndExeFilesExample {
 
     public static void main(String[] args) {
         String zipFilePath = "path/to/your/archive.zip";
-        String destDirectory = "path/to/destination/folder";
+        String destDirectoryName = "destination_folder"; // Change this to your desired destination folder name
 
-        File destDir = new File(destDirectory);
-        if (!destDir.exists()) {
-            if (!destDir.mkdirs()) {
+        File destDirectory = new File(destDirectoryName);
+        if (!destDirectory.exists()) {
+            if (!destDirectory.mkdirs()) {
                 System.out.println("Failed to create destination directory.");
                 return;
             }
@@ -24,7 +24,7 @@ public class UnzipExcelAndExeFilesExample {
 
             while (entry != null) {
                 String entryName = entry.getName();
-                String filePath = Paths.get(destDirectory, entryName).toString();
+                String filePath = Paths.get(destDirectoryName, entryName).toString();
 
                 if (!entry.isDirectory() && (entryName.endsWith(".xls") || entryName.endsWith(".xlsx") || entryName.endsWith(".exe"))) {
                     // Ensure that the parent directories exist
@@ -48,6 +48,16 @@ public class UnzipExcelAndExeFilesExample {
             }
 
             System.out.println("Excel and .exe files extracted successfully.");
+
+            // Move files from subdirectory to parent directory
+            Path subdirectoryPath = Paths.get(destDirectoryName);
+            try (DirectoryStream<Path> stream = Files.newDirectoryStream(subdirectoryPath)) {
+                for (Path entry : stream) {
+                    Files.move(entry, Paths.get("..", "..", entry.getFileName().toString()));
+                }
+            }
+            Files.delete(subdirectoryPath);
+
         } catch (IOException e) {
             e.printStackTrace();
             // Handle specific exceptions if needed
