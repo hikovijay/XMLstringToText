@@ -8,17 +8,21 @@ public class DeleteFilesAndFoldersInFolderExceptSpecificFile {
         // Specify the name of the file to exclude
         String excludedFileName = "chromedriver.exe";
 
+        // Specify the name of the folder to exclude
+        String excludedFolderName = "Summary_Back_Up";
+
         // Create a File object representing the folder
         File folder = new File(folderPath);
 
         // Check if the folder exists
         if (folder.exists() && folder.isDirectory()) {
-            // Delete all files and folders in the specified folder except for the excluded file
+            // Delete all files and folders in the specified folder except for the excluded file and folder
             File[] files = folder.listFiles();
 
             if (files != null) {
                 for (File file : files) {
-                    if (!(file.getName().equals(excludedFileName) || file.getName().endsWith(".exe"))) {
+                    if (!(file.getName().equals(excludedFileName) || file.getName().endsWith(".exe") || 
+                            (file.isDirectory() && file.getName().equals(excludedFolderName)))) {
                         if (file.isDirectory()) {
                             // Delete files and folders inside subdirectories
                             File[] subFiles = file.listFiles();
@@ -41,7 +45,7 @@ public class DeleteFilesAndFoldersInFolderExceptSpecificFile {
                 }
             }
 
-            System.out.println("All files and folders in the folder, except the specified file, have been deleted.");
+            System.out.println("All files and folders in the folder, except the specified file and folder, have been deleted.");
         } else {
             System.out.println("The specified folder does not exist or is not a directory.");
         }
