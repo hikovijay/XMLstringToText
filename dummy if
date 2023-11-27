@@ -1,0 +1,25 @@
+public class StringComparisonExample {
+
+    public static void main(String[] args) {
+        // Predefined string for comparison
+        String predefinedString = "Example";
+
+        // Two example strings
+        String string1 = "Hello";
+        String string2 = "World";
+
+        // Compare the first string with the predefined string
+        if (string1 != null && !string1.isEmpty() && string1.equals(predefinedString)) {
+            // Execute code for the first string
+            System.out.println("String 1 matches the predefined string: " + string1);
+            // Add your code here for processing the first string
+        }
+
+        // Compare the second string with the predefined string
+        if (string2 != null && !string2.isEmpty() && string2.equals(predefinedString)) {
+            // Execute code for the second string
+            System.out.println("String 2 matches the predefined string: " + string2);
+            // Add your code here for processing the second string
+        }
+    }
+}
