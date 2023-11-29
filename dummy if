@@ -1,24 +1,33 @@
-File folder = new File(folderPath);
+import java.io.File;
+
+public class ExcelFileChecker {
+
+    public static void main(String[] args) {
+        String folderPath = "/path/to/your/folder"; // Change this to the folder path you want to check
+
+        boolean excelFilesExist = checkForExcelFiles(folderPath);
+
+        if (excelFilesExist) {
+            System.out.println("Excel files exist in the folder.");
+            // Perform some action for the presence of Excel files
+        } else {
+            System.out.println("No Excel files found in the folder.");
+            // Perform some other action when no Excel files are found
+        }
+    }
+
+    private static boolean checkForExcelFiles(String folderPath) {
+        File folder = new File(folderPath);
         File[] files = folder.listFiles();
 
         if (files != null) {
-            boolean excelFilesExist = false;
-
             for (File file : files) {
                 if (file.isFile() && file.getName().endsWith(".xlsx")) {
-                    excelFilesExist = true;
-                    break; // Exit the loop as soon as an Excel file is found
+                    return true; // Return true as soon as an Excel file is found
                 }
             }
-
-            if (excelFilesExist) {
-                System.out.println("Excel files exist in the folder.");
-                // Perform some action for the presence of Excel files
-            } else {
-                System.out.println("No Excel files found in the folder.");
-                // Perform some other action when no Excel files are found
-            }
-        } else {
-            System.out.println("Invalid folder path or no access to the folder.");
-            // Handle the case where the folder is invalid or access is denied
         }
+
+        return false; // Return false if no Excel files are found or there's an issue with the folder
+    }
+}
