@@ -19,11 +19,18 @@ public class ExcelFileHandler {
         File sourceFile = new File(sourceFilePath);
 
         if (sourceFile.exists() && sourceFile.isFile() && sourceFilePath.toLowerCase().endsWith(".xlsx")) {
+            // Check if destination folder exists, create it if not
+            Path destinationFolder = Paths.get(destinationFolderPath);
+            if (!Files.exists(destinationFolder)) {
+                Files.createDirectories(destinationFolder);
+                System.out.println("Destination folder created: " + destinationFolder);
+            }
+
             Path sourcePath = Paths.get(sourceFilePath);
             Path destinationPath = Paths.get(destinationFolderPath, sourcePath.getFileName().toString());
 
             Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("Excel file copied successfully!");
+            System.out.println("Excel file copied successfully to: " + destinationPath);
         } else {
             System.out.println("Excel file does not exist or is not a valid Excel file!");
         }
