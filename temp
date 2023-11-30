@@ -7,15 +7,17 @@ public class ExcelFileHandler {
     public static void main(String[] args) {
         String sourceFilePath = "path/to/source/excel/file.xlsx";
         String destinationFolderPath = "path/to/destination/folder/";
+        String newFileName = "newFileName.xlsx";
 
         try {
-            copyExcelFileIfExist(sourceFilePath, destinationFolderPath);
+            copyAndRenameExcelFile(sourceFilePath, destinationFolderPath, newFileName);
         } catch (IOException e) {
             System.err.println("Error handling Excel file: " + e.getMessage());
         }
     }
 
-    private static void copyExcelFileIfExist(String sourceFilePath, String destinationFolderPath) throws IOException {
+    private static void copyAndRenameExcelFile(String sourceFilePath, String destinationFolderPath, String newFileName)
+            throws IOException {
         File sourceFile = new File(sourceFilePath);
 
         if (sourceFile.exists() && sourceFile.isFile() && sourceFilePath.toLowerCase().endsWith(".xlsx")) {
@@ -27,10 +29,14 @@ public class ExcelFileHandler {
             }
 
             Path sourcePath = Paths.get(sourceFilePath);
-            Path destinationPath = Paths.get(destinationFolderPath, sourcePath.getFileName().toString());
+            Path destinationPath = Paths.get(destinationFolderPath, newFileName);
 
             Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("Excel file copied successfully to: " + destinationPath);
+            System.out.println("Excel file copied and renamed successfully to: " + destinationPath);
+
+            // Delete the source file after copying
+            Files.delete(sourcePath);
+            System.out.println("Source file deleted successfully.");
         } else {
             System.out.println("Excel file does not exist or is not a valid Excel file!");
         }
