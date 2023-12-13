@@ -1,44 +1,31 @@
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class ExcelFileHandler {
-
+public class TextPresentExample {
     public static void main(String[] args) {
-        String sourceFilePath = "path/to/source/excel/file.xlsx";
-        String destinationFolderPath = "path/to/destination/folder/";
-        String newFileName = "newFileName.xlsx";
+        // Set the path to your chromedriver
+        System.setProperty("webdriver.chrome.driver", "path/to/chromedriver");
 
-        try {
-            copyAndRenameExcelFile(sourceFilePath, destinationFolderPath, newFileName);
-        } catch (IOException e) {
-            System.err.println("Error handling Excel file: " + e.getMessage());
-        }
-    }
+        // Initialize the WebDriver
+        WebDriver driver = new ChromeDriver();
 
-    private static void copyAndRenameExcelFile(String sourceFilePath, String destinationFolderPath, String newFileName)
-            throws IOException {
-        File sourceFile = new File(sourceFilePath);
+        // Open the webpage
+        driver.get("https://example.com");
 
-        if (sourceFile.exists() && sourceFile.isFile() && sourceFilePath.toLowerCase().endsWith(".xlsx")) {
-            // Check if destination folder exists, create it if not
-            Path destinationFolder = Paths.get(destinationFolderPath);
-            if (!Files.exists(destinationFolder)) {
-                Files.createDirectories(destinationFolder);
-                System.out.println("Destination folder created: " + destinationFolder);
-            }
+        // Wait for the specific text to be present in the DOM
+        String targetText = "Your Target Text";
+        WebElement element = (new WebDriverWait(driver, 30))
+                .until(ExpectedConditions.textToBePresentInElementLocated(By.xpath("//*[contains(text(),'" + targetText + "')]"), targetText));
 
-            Path sourcePath = Paths.get(sourceFilePath);
-            Path destinationPath = Paths.get(destinationFolderPath, newFileName);
+        // Perform actions after the text is present
+        System.out.println("Target text '" + targetText + "' is present in the DOM.");
+        // Add more steps as needed
 
-            Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("Excel file copied and renamed successfully to: " + destinationPath);
-
-            // Delete the source file after copying
-            Files.delete(sourcePath);
-            System.out.println("Source file deleted successfully.");
-        } else {
-            System.out.println("Excel file does not exist or is not a valid Excel file!");
-        }
+        // Close the browser
+        driver.quit();
     }
 }
