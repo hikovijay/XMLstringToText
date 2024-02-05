@@ -2,20 +2,15 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-public class RestAssuredExampleWithFileReading {
+public class RestAssuredExampleWithResponseParsingAndSecondRequest {
     public static void main(String[] args) {
         // Define the base URL for your first API
         String firstApiBaseUrl = "https://api.example.com";
         // Define the endpoint for the first API
         String firstApiEndpoint = "/firstEndpoint";
 
-        // Read the JSON payload for the first API from a file
-        String jsonPayloadFilePath = "path/to/firstApiPayload.json";
-        String jsonPayload = readJsonFile(jsonPayloadFilePath);
+        // Define your JSON payload for the first API as a string
+        String jsonPayload = "{ \"key\": \"value\", \"anotherKey\": \"anotherValue\" }";
 
         // Define your credentials for basic authentication for the first API
         String username = "yourUsername";
@@ -45,28 +40,14 @@ public class RestAssuredExampleWithFileReading {
         // Define the endpoint for the second API
         String secondApiEndpoint = "/secondEndpoint";
 
-        // Read the second JSON payload from a file
-        String secondJsonPayloadFilePath = "path/to/secondApiPayload.json";
-        String secondJsonPayloadFromFile = readJsonFile(secondJsonPayloadFilePath);
-
         // Send the POST request to the second API with RestAssured
         RestAssured.given()
                 .contentType(ContentType.JSON) // Set the content type to JSON
-                .body(secondJsonPayloadFromFile) // Set the second JSON payload from file
+                .body(secondJsonPayload) // Set the second JSON payload
                 .when()
                 .post(secondApiBaseUrl + secondApiEndpoint) // Specify the HTTP method and endpoint
                 .then()
                 .statusCode(200) // Check the expected status code
                 .log().all(); // Log the response details
-    }
-
-    // Helper method to read JSON file content as a string
-    private static String readJsonFile(String filePath) {
-        try {
-            return new String(Files.readAllBytes(Paths.get(filePath)));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 }
