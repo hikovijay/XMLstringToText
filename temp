@@ -1,16 +1,50 @@
-<dependencies>
-    <!-- RestAssured for API testing -->
-    <dependency>
-        <groupId>io.rest-assured</groupId>
-        <artifactId>rest-assured</artifactId>
-        <version>4.4.0</version> <!-- Use the latest version available -->
-        <scope>test</scope>
-    </dependency>
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 
-    <!-- If you want to use the Jackson library for JSON parsing -->
-    <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-databind</artifactId>
-        <version>2.13.0</version> <!-- Use the latest version available -->
-    </dependency>
-</dependencies>
+public class RestAssuredExampleWithHeadersAndResponsePrinting {
+    public static void main(String[] args) {
+        // Define the base URL for your API
+        String apiBaseUrl = "https://api.example.com";
+        // Define the endpoint for your API
+        String apiEndpoint = "/yourApiEndpoint";
+
+        // Define your JSON payload for the API as a string
+        String jsonPayload = "{ \"key\": \"value\", \"anotherKey\": \"anotherValue\" }";
+
+        // Define your credentials for basic authentication
+        String username = "yourUsername";
+        String password = "yourPassword";
+
+        // Define custom headers for the API request
+        String customHeader1Key = "Custom-Header-1";
+        String customHeader1Value = "Value1";
+
+        String customHeader2Key = "Custom-Header-2";
+        String customHeader2Value = "Value2";
+
+        // Send the POST request to the API with RestAssured including authorization and custom headers
+        Response apiResponse = RestAssured.given()
+                .auth().basic(username, password) // Basic authentication
+                .contentType(ContentType.JSON) // Set the content type to JSON
+                .header(customHeader1Key, customHeader1Value) // Add custom header 1
+                .header(customHeader2Key, customHeader2Value) // Add custom header 2
+                .body(jsonPayload) // Set the JSON payload
+                .when()
+                .post(apiBaseUrl + apiEndpoint) // Specify the HTTP method and endpoint
+                .then()
+                .statusCode(200) // Check the expected status code
+                .log().all() // Log the response details, including the response body
+                .extract().response(); // Extract the response
+
+        // Parse the API response to extract specific values
+        String polNumber = apiResponse.jsonPath().getString("Policy.PolNumber");
+        String hoAssignedAppNumber = apiResponse.jsonPath().getString("Policy.ApplicationInfo.HOAssignedAppNumber");
+
+        // Print the extracted values
+        System.out.println("PolNumber: " + polNumber);
+        System.out.println("HOAssignedAppNumber: " + hoAssignedAppNumber);
+
+        // Now you can use these values as needed in your further logic or in the second API request.
+    }
+}
