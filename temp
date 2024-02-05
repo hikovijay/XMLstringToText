@@ -1,31 +1,16 @@
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+<dependencies>
+    <!-- RestAssured for API testing -->
+    <dependency>
+        <groupId>io.rest-assured</groupId>
+        <artifactId>rest-assured</artifactId>
+        <version>4.4.0</version> <!-- Use the latest version available -->
+        <scope>test</scope>
+    </dependency>
 
-public class TextPresentExample {
-    public static void main(String[] args) {
-        // Set the path to your chromedriver
-        System.setProperty("webdriver.chrome.driver", "path/to/chromedriver");
-
-        // Initialize the WebDriver
-        WebDriver driver = new ChromeDriver();
-
-        // Open the webpage
-        driver.get("https://example.com");
-
-        // Wait for the specific text to be present in the DOM
-        String targetText = "Your Target Text";
-        WebElement element = (new WebDriverWait(driver, 30))
-                .until(ExpectedConditions.textToBePresentInElementLocated(By.xpath("//*[contains(text(),'" + targetText + "')]"), targetText));
-
-        // Perform actions after the text is present
-        System.out.println("Target text '" + targetText + "' is present in the DOM.");
-        // Add more steps as needed
-
-        // Close the browser
-        driver.quit();
-    }
-}
+    <!-- If you want to use the Jackson library for JSON parsing -->
+    <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>2.13.0</version> <!-- Use the latest version available -->
+    </dependency>
+</dependencies>
