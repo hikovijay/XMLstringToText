@@ -1,0 +1,72 @@
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+public class RestAssuredExampleWithFileReading {
+    public static void main(String[] args) {
+        // Define the base URL for your first API
+        String firstApiBaseUrl = "https://api.example.com";
+        // Define the endpoint for the first API
+        String firstApiEndpoint = "/firstEndpoint";
+
+        // Read the JSON payload for the first API from a file
+        String jsonPayloadFilePath = "path/to/firstApiPayload.json";
+        String jsonPayload = readJsonFile(jsonPayloadFilePath);
+
+        // Define your credentials for basic authentication for the first API
+        String username = "yourUsername";
+        String password = "yourPassword";
+
+        // Send the POST request to the first API with RestAssured including authorization
+        Response firstApiResponse = RestAssured.given()
+                .auth().basic(username, password) // Basic authentication
+                .contentType(ContentType.JSON) // Set the content type to JSON
+                .body(jsonPayload) // Set the JSON payload
+                .when()
+                .post(firstApiBaseUrl + firstApiEndpoint) // Specify the HTTP method and endpoint
+                .then()
+                .statusCode(200) // Check the expected status code
+                .extract().response(); // Extract the response
+
+        // Parse the first API response to extract specific values
+        String key1Value = firstApiResponse.jsonPath().getString("key1");
+        String key2Value = firstApiResponse.jsonPath().getString("key2");
+        String key3Value = firstApiResponse.jsonPath().getString("key3");
+
+        // Now create a new JSON payload using the extracted values
+        String secondJsonPayload = "{ \"key1\": \"" + key1Value + "\", \"key2\": \"" + key2Value + "\", \"key3\": \"" + key3Value + "\" }";
+
+        // Define the base URL for your second API
+        String secondApiBaseUrl = "https://api.example.com";
+        // Define the endpoint for the second API
+        String secondApiEndpoint = "/secondEndpoint";
+
+        // Read the second JSON payload from a file
+        String secondJsonPayloadFilePath = "path/to/secondApiPayload.json";
+        String secondJsonPayloadFromFile = readJsonFile(secondJsonPayloadFilePath);
+
+        // Send the POST request to the second API with RestAssured
+        RestAssured.given()
+                .contentType(ContentType.JSON) // Set the content type to JSON
+                .body(secondJsonPayloadFromFile) // Set the second JSON payload from file
+                .when()
+                .post(secondApiBaseUrl + secondApiEndpoint) // Specify the HTTP method and endpoint
+                .then()
+                .statusCode(200) // Check the expected status code
+                .log().all(); // Log the response details
+    }
+
+    // Helper method to read JSON file content as a string
+    private static String readJsonFile(String filePath) {
+        try {
+            return new String(Files.readAllBytes(Paths.get(filePath)));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+}
